@@ -1,6 +1,6 @@
-# Vapar · Gestão de contatos do WhatsApp
+# Veipar · Gestão de contatos do WhatsApp
 
-Registra todo número que chama no WhatsApp Business da Vapar, mostra num painel interno e
+Registra todo número que chama no WhatsApp Business da Veipar, mostra num painel interno e
 avisa o gerente no WhatsApp quando chega um contato novo. **O atendimento continua no app
 WhatsApp Business**, como hoje; o sistema só observa e registra.
 
@@ -57,14 +57,14 @@ tests/                vitest
 3. Anote `Project URL` e a `service_role key` (Settings → API). A service role **nunca** vai para o front.
 
 ### 2. Z-API
-1. Em [z-api.io](https://www.z-api.io) crie uma instância e leia o QR code com o **app WhatsApp Business da Vapar**
+1. Em [z-api.io](https://www.z-api.io) crie uma instância e leia o QR code com o **app WhatsApp Business da Veipar**
    (Aparelhos conectados → Conectar aparelho). O atendimento continua normalmente no celular.
 2. Anote o **ID** e o **Token** da instância e o **Token de segurança da conta** (Segurança → Client-Token).
 
 ### 3. Vercel
 1. Importe este repositório do GitHub na Vercel. O `vercel.json` já define o build (`npm run build`) e a saída (`dist`).
 2. Em **Settings → Environment Variables**, preencha tudo do `.env.example`.
-3. Faça o deploy e anote a URL (ex.: `https://vapar.vercel.app`).
+3. Faça o deploy e anote a URL (ex.: `https://veipar.vercel.app`).
 
 ### 4. Webhook na Z-API
 Na instância → **Webhooks e configurações gerais**:
@@ -72,12 +72,12 @@ Na instância → **Webhooks e configurações gerais**:
 - Ligue **Notificar as enviadas por mim** (necessário para medir o tempo de resposta).
 - Os demais webhooks (status, desconectado etc.) podem ficar vazios.
 
-**Aviso em grupo (opcional):** adicione o número da Vapar ao grupo da equipe, abra
+**Aviso em grupo (opcional):** adicione o número da Veipar ao grupo da equipe, abra
 `https://<sua-url>/api/groups` com o header `Authorization: Bearer <DASHBOARD_PASSWORD>`
 (ou `curl -H "Authorization: Bearer ..." https://<sua-url>/api/groups`), copie o `phone` do grupo
 (termina em `-group`) para `NOTIFY_GROUP_IDS` e faça redeploy.
 
-Teste: mande uma mensagem de outro celular para o número da Vapar e confira o painel e o WhatsApp do gerente.
+Teste: mande uma mensagem de outro celular para o número da Veipar e confira o painel e o WhatsApp do gerente.
 
 ### Cuidados com a Z-API
 - A Z-API **não é a API oficial da Meta**: ela opera uma sessão do WhatsApp Web. Há risco de bloqueio do número se
@@ -100,7 +100,7 @@ Só o painel, apontando a API para outro servidor: `VITE_API_PROXY=http://localh
 ### Design system
 - Componentes [shadcn/ui](https://ui.shadcn.com) em `web/src/components/ui` (adicione outros com `npx shadcn@latest add <nome>`).
 - Tokens da marca em `web/src/index.css`: fundo branco, tinta escura `#0f1720`, cores **provisórias** (azul `#2a78d6` e grafite `#4e5a63`).
-  Troque `--brand*` e `--chart-*` pelas cores oficiais da Vapar.
+  Troque `--brand*` e `--chart-*` pelas cores oficiais da Veipar.
 - Nome, monograma e saudação do WhatsApp em `web/src/brand.ts`.
 - Para usar a logo: salve `web/public/logo-icone.png` e troque o `<Monogram />` em `web/src/components/Brand.tsx` por `<img src="/logo-icone.png" className="size-10" alt="" />`.
 

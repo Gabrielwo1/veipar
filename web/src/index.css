@@ -3,7 +3,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Tokens da marca Vapar (PROVISÓRIOS: azul + grafite). Troque --brand* e --chart-* pelas cores oficiais. */
+/* Tokens da marca: azul do ícone (#0b9df0) + grafite. Troque --brand* e --chart-* para outra marca. */
 :root {
   --radius: 0.75rem;
   --background: #ffffff;
@@ -18,26 +18,26 @@
   --secondary-foreground: #1d2a33;
   --muted: #f5f7f6;
   --muted-foreground: #5b6670;
-  --accent: #eef4fc;
-  --accent-foreground: #1c5cab;
+  --accent: #e8f6fe;
+  --accent-foreground: #0870b0;
   --destructive: #c4321f;
   --border: #e4e8e6;
   --input: #dfe4e2;
-  --ring: #256abf;
+  --ring: #0a8ad6;
 
-  --brand: #2a78d6;
-  --brand-strong: #256abf;
-  --brand-deep: #1c5cab;
-  --brand-soft: #e6f0fb;
+  --brand: #0b9df0;
+  --brand-strong: #0a8ad6;
+  --brand-deep: #0870b0;
+  --brand-soft: #e3f4fe;
   --graphite: #4e5a63;
   --petroleum: #537473;
 
   /* Séries dos gráficos */
-  --chart-1: #2a78d6;
+  --chart-1: #0b9df0;
   --chart-2: #4e5a63;
-  --chart-3: #86b6ef;
+  --chart-3: #7cccf7;
   --chart-4: #9aa6ae;
-  --chart-5: #1c5cab;
+  --chart-5: #0870b0;
 }
 
 @theme inline {

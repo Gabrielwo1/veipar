@@ -1,4 +1,4 @@
--- Vapar · gestão de contatos do WhatsApp
+-- Veipar · gestão de contatos do WhatsApp
 -- Rode no SQL Editor do Supabase (ou `supabase db push`).
 
 create table if not exists public.contacts (

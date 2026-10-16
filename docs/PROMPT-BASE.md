@@ -39,7 +39,7 @@ onde a equipe lança o valor das vendas.
 
 **Identidade visual:** fundo branco, tinta escura, cores da marca <cores hex>, logo em <caminho dos arquivos>.
 
-**Atalho:** o projeto `/Users/syntax/vapar` (ou `/Users/syntax/vicofarma/whatsapp-gestao`) já implementa tudo isso.
+**Atalho:** o projeto `/Users/syntax/Veipar` (ou `/Users/syntax/vicofarma/whatsapp-gestao`) já implementa tudo isso.
 Copie-o, troque `web/src/brand.ts`, as cores em `web/src/index.css`, os textos do README e crie Supabase, Vercel e
 GitHub novos.
 

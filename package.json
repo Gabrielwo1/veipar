@@ -1,8 +1,8 @@
 {
-  "name": "vapar-whatsapp-gestao",
+  "name": "veipar-whatsapp-gestao",
   "version": "0.1.0",
   "private": true,
-  "description": "Gestão interna de contatos do WhatsApp da Vapar + aviso ao gerente",
+  "description": "Gestão interna de contatos do WhatsApp da Veipar + aviso ao gerente",
   "type": "module",
   "engines": {
     "node": ">=20"

@@ -13,7 +13,7 @@ export function Login({ error, onSubmit }: { error?: string; onSubmit: (password
       <Card className="w-full max-w-sm shadow-xl shadow-black/5">
         <CardContent className="flex flex-col gap-6 pt-2">
           <div className="flex flex-col items-center gap-3">
-            <Monogram className="size-16 rounded-2xl text-3xl" />
+            <Monogram className="size-16" />
             <span className="text-2xl font-bold tracking-tight">{brand.name}</span>
           </div>
           <div className="text-center">

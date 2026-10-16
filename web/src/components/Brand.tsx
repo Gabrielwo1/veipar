@@ -1,14 +1,9 @@
 import { brand } from '@/brand';
 import { cn } from '@/lib/utils';
 
-/** Monograma provisório. Para usar a logo, troque por <img src="/logo-icone.png" /> (veja README). */
+/** Ícone da marca (web/public/logo-icone.png). Sem a logo, troque pelo monograma em brand.monogram. */
 export function Monogram({ className }: { className?: string }) {
-  return (
-    <div className={cn('grid size-10 shrink-0 place-items-center rounded-xl bg-primary text-lg font-bold text-primary-foreground shadow-sm', className)}>
-      {brand.monogram}
-      <span className="sr-only">{brand.name}</span>
-    </div>
-  );
+  return <img src="/logo-icone.png" alt={brand.name} className={cn('size-10 shrink-0 rounded-full shadow-sm', className)} />;
 }
 
 export function Brand({ subtitle }: { subtitle?: string }) {
