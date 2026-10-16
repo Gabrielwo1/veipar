@@ -51,7 +51,7 @@ export interface DashboardData {
   sales: SaleWithContact[];
   lines: Record<string, string>;
   timezone: string;
-  /** IA configurada no servidor (ANTHROPIC_API_KEY presente e AI_ENABLED != false). */
+  /** IA configurada no servidor (OPENAI_API_KEY presente e AI_ENABLED != false). */
   ai: boolean;
 }
 

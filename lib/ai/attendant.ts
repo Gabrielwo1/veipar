@@ -1,20 +1,19 @@
-import Anthropic from '@anthropic-ai/sdk';
+import OpenAI from 'openai';
+import type { FunctionTool, ResponseFunctionToolCall, ResponseInputItem, Response as AIResponse } from 'openai/resources/responses/responses';
 import { env } from '../env.js';
 import { getChatState, getMessages, handoff, registerSent, type ChatMessage } from '../db.js';
 import { sendText } from '../whatsapp.js';
 import { SYSTEM_PROMPT } from './prompt.js';
 
-type BetaMessageParam = Anthropic.Beta.BetaMessageParam;
-type BetaMessage = Anthropic.Beta.BetaMessage;
-
-const HANDOFF_TOOL: Anthropic.Beta.BetaTool = {
+const HANDOFF_TOOL: FunctionTool = {
+  type: 'function',
   name: 'encaminhar_para_vendedor',
   description:
     'Passa a conversa para um vendedor humano da Veipar. Use assim que souber QUAL produto o cliente quer e QUANTO ' +
     '(quantidade), ou quando o cliente pedir para falar com uma pessoa, reclamar, pedir preço/condição especial que você ' +
     'não pode confirmar, ou quando você não souber responder com segurança. Depois de usar, a IA para de responder.',
   strict: true,
-  input_schema: {
+  parameters: {
     type: 'object',
     additionalProperties: false,
     required: ['motivo', 'itens', 'nome_cliente', 'cidade_uf', 'perfil', 'observacoes', 'resumo'],
@@ -42,6 +41,8 @@ const HANDOFF_TOOL: Anthropic.Beta.BetaTool = {
   },
 };
 
+export type Turn = { role: 'user' | 'assistant'; content: string };
+
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const MEDIA_LABEL: Record<string, string> = {
@@ -55,9 +56,9 @@ function render(m: ChatMessage): string {
   return m.body ? `[cliente enviou ${what} com a legenda: ${m.body}]` : `[cliente enviou ${what}]`;
 }
 
-/** Histórico do banco no formato da API: cliente = user; IA e equipe = assistant. */
-export function toConversation(history: ChatMessage[]): BetaMessageParam[] {
-  const out: BetaMessageParam[] = [];
+/** Histórico do banco no formato de chat: cliente = user; IA e equipe = assistant. */
+export function toConversation(history: ChatMessage[]): Turn[] {
+  const out: Turn[] = [];
   for (const m of history) {
     const role = m.author === 'customer' ? 'user' : 'assistant';
     const text = m.author === 'human' ? `[vendedor da equipe] ${m.body ?? ''}` : render(m);
@@ -76,29 +77,67 @@ export function toBubbles(text: string): string[] {
   return [...parts.slice(0, 2), parts.slice(2).join('\n\n')];
 }
 
-const textOf = (m: BetaMessage) =>
-  m.content.filter((b): b is Anthropic.Beta.BetaTextBlock => b.type === 'text').map((b) => b.text).join('\n\n').trim();
+/** Texto da resposta, ou '' se o modelo recusou. */
+const textOf = (r: AIResponse) =>
+  r.output
+    .flatMap((o) => (o.type === 'message' ? o.content : []))
+    .map((c) => (c.type === 'output_text' ? c.text : ''))
+    .join('\n\n')
+    .trim();
 
-let client: Anthropic | undefined;
+let client: OpenAI | undefined;
 
-async function ask(messages: BetaMessageParam[]): Promise<BetaMessage> {
-  client ??= new Anthropic();
-  return client.beta.messages.create({
+async function ask(input: ResponseInputItem[], context: string): Promise<AIResponse> {
+  client ??= new OpenAI();
+  return client.responses.create({
     model: env.aiModel,
-    max_tokens: 4000,
-    betas: ['server-side-fallback-2026-07-01'],
-    fallbacks: 'default',
-    output_config: { effort: 'low' },
-    cache_control: { type: 'ephemeral' },
-    system: SYSTEM_PROMPT,
+    store: false,
+    include: ['reasoning.encrypted_content'], // permite devolver o raciocínio junto com a chamada da ferramenta
+    reasoning: { effort: 'low' },
+    instructions: `${SYSTEM_PROMPT}\n\n# Contexto desta conversa\n${context}`,
     tools: [HANDOFF_TOOL],
-    messages,
+    input,
   });
+}
+
+/**
+ * Gera a resposta da IA para a conversa. Se ela decidir encaminhar, devolve também o resumo do pedido
+ * e garante uma mensagem de transição para o cliente.
+ */
+export async function generateReply(turns: Turn[], context: string): Promise<{ replies: string[]; summary: Record<string, unknown> | null }> {
+  const input: ResponseInputItem[] = turns;
+  const response = await ask(input, context);
+  const replies: string[] = [];
+  const first = textOf(response);
+  if (first) replies.push(first);
+
+  const call = response.output.find((o): o is ResponseFunctionToolCall => o.type === 'function_call');
+  if (!call) return { replies, summary: null };
+
+  let summary: Record<string, unknown>;
+  try {
+    summary = JSON.parse(call.arguments);
+  } catch {
+    summary = { motivo: 'fora_do_escopo', itens: [], resumo: 'A IA encaminhou sem conseguir montar o resumo.' };
+  }
+  if (!first) {
+    // A IA chamou a ferramenta sem escrever nada: pede a mensagem de transição para o cliente.
+    const after = textOf(await ask([
+      ...input,
+      ...(response.output as ResponseInputItem[]),
+      {
+        type: 'function_call_output', call_id: call.call_id,
+        output: 'Encaminhado. Escreva agora a mensagem curta avisando o cliente que um vendedor vai continuar o atendimento por aqui.',
+      },
+    ], context));
+    if (after) replies.push(after);
+  }
+  return { replies, summary };
 }
 
 /** Há mensagem mais nova que `messageId`, do cliente ou da equipe? Então esta execução não responde. */
 async function superseded(waId: string, messageId: string): Promise<boolean> {
-  const [latest] = (await getMessages(waId, 1));
+  const [latest] = await getMessages(waId, 1);
   return !!latest && latest.id !== messageId && latest.author !== 'ai';
 }
 
@@ -113,48 +152,15 @@ export async function runAttendant(waId: string, messageId: string): Promise<voi
   if (!state?.ai_enabled || state.handoff_at) return;
   if (await superseded(waId, messageId)) return;
 
-  const messages = toConversation(await getMessages(waId));
-  if (messages.at(-1)?.role !== 'user') return;
+  const turns = toConversation(await getMessages(waId));
+  if (turns.at(-1)?.role !== 'user') return;
 
-  // Contexto de data/hora para a IA (fora do system prompt, para não quebrar o cache).
-  messages.push({
-    role: 'system',
-    content: `Agora: ${new Date().toLocaleString('pt-BR', { timeZone: env.timezone })}. Nome no perfil do WhatsApp: ${state.name || 'não informado'}.`,
-  });
-
-  let response = await ask(messages);
-  if (response.stop_reason === 'refusal') {
-    await handoff(waId, { motivo: 'fora_do_escopo', itens: [], resumo: 'A IA não conseguiu responder esta conversa.' });
-    return;
-  }
-
-  const replies: string[] = [];
-  const first = textOf(response);
-  if (first) replies.push(first);
-
-  const call = response.content.find((b): b is Anthropic.Beta.BetaToolUseBlock => b.type === 'tool_use');
-  if (call) {
-    await handoff(waId, call.input as Record<string, unknown>);
-    if (!first) {
-      // A IA chamou a ferramenta sem escrever nada: pede a mensagem de transição para o cliente.
-      response = await ask([
-        ...messages,
-        { role: 'assistant', content: response.content as Anthropic.Beta.BetaContentBlockParam[] },
-        {
-          role: 'user',
-          content: [{
-            type: 'tool_result', tool_use_id: call.id,
-            content: 'Encaminhado. Escreva agora a mensagem curta avisando o cliente que um vendedor vai continuar o atendimento por aqui.',
-          }],
-        },
-      ]);
-      const after = response.stop_reason === 'refusal' ? '' : textOf(response);
-      if (after) replies.push(after);
-    }
-  }
+  const context = `Agora: ${new Date().toLocaleString('pt-BR', { timeZone: env.timezone })}. Nome no perfil do WhatsApp: ${state.name || 'não informado'}.`;
+  const { replies, summary } = await generateReply(turns, context);
+  if (summary) await handoff(waId, summary);
 
   if (!replies.length) return;
-  if (!call && (await superseded(waId, messageId))) return; // cliente mandou mais coisa enquanto a IA pensava
+  if (!summary && (await superseded(waId, messageId))) return; // cliente mandou mais coisa enquanto a IA pensava
 
   for (const bubble of replies.flatMap(toBubbles)) {
     const typing = Math.min(6, Math.max(2, Math.round(bubble.length / 40)));

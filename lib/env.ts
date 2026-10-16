@@ -38,10 +38,10 @@ export const env = {
     );
   },
 
-  // Atendente de IA (a chave fica em ANTHROPIC_API_KEY, lida pelo SDK)
+  // Atendente de IA (OpenAI; a chave fica em OPENAI_API_KEY, lida pelo SDK)
   /** AI_ENABLED=false desliga a IA para todas as conversas. */
-  get aiEnabled() { return process.env.AI_ENABLED !== 'false' && !!process.env.ANTHROPIC_API_KEY; },
-  get aiModel() { return process.env.AI_MODEL || 'claude-opus-5-5'; },
+  get aiEnabled() { return process.env.AI_ENABLED !== 'false' && !!process.env.OPENAI_API_KEY; },
+  get aiModel() { return process.env.AI_MODEL || 'gpt-5.5'; },
   /** Espera antes de responder, para juntar mensagens enviadas em sequência pelo cliente. */
   get aiDebounceMs() { return Number(process.env.AI_DEBOUNCE_SECONDS ?? 8) * 1000; },
 

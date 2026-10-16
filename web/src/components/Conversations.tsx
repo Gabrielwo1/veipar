@@ -126,7 +126,7 @@ export function Conversations({ contacts, aiOn, onContactChange, onError }: Prop
         <div className="hidden flex-col items-center justify-center gap-2 bg-muted/30 text-center text-sm text-muted-foreground md:flex">
           <Bot className="size-8 text-brand" />
           Escolha uma conversa para ver as mensagens.
-          {aiOn ? <span>A IA responde sozinha até o pedido ficar pronto.</span> : <span>IA desligada: configure ANTHROPIC_API_KEY na Vercel.</span>}
+          {aiOn ? <span>A IA responde sozinha até o pedido ficar pronto.</span> : <span>IA desligada: configure OPENAI_API_KEY na Vercel.</span>}
         </div>
       )}
     </Card>
