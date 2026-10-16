@@ -19,8 +19,8 @@ export async function POST(request: Request): Promise<Response> {
     if (known.error) throw new Error(known.error.message);
     const inSystem = new Set((known.data ?? []).map((c) => c.wa_id));
     const rows = chats
-      .filter((c) => c.lastMessageTime > 0 && c.lastMessageTime < before && !inSystem.has(c.phone))
-      .map((c) => ({ wa_id: c.phone, name: c.name || null, last_message_at: new Date(c.lastMessageTime).toISOString() }));
+      .filter((c) => c.lastMessageTime < before && !inSystem.has(c.phone)) // chats antigos podem vir sem data (0)
+      .map((c) => ({ wa_id: c.phone, name: c.name || null, last_message_at: c.lastMessageTime ? new Date(c.lastMessageTime).toISOString() : null }));
 
     if (rows.length) {
       const { error } = await db().from('pre_existing_chats').upsert(rows, { onConflict: 'wa_id' });
