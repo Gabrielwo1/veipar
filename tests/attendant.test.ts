@@ -39,3 +39,25 @@ describe('toBubbles', () => {
     expect(toBubbles('a\n\nb\n\nc\n\nd')).toEqual(['a', 'b', 'c\n\nd']);
   });
 });
+
+describe('toConversation · continuidade', () => {
+  const at = (iso: string, m: ChatMessage) => ({ ...m, sent_at: iso });
+
+  it('mostra a mensagem citada pelo cliente', () => {
+    const conv = toConversation([
+      msg('1', 'customer', 'oi'),
+      msg('2', 'ai', 'Protetor ou bico?'),
+      { ...msg('3', 'customer', 'esse'), reply_to: '2' },
+    ]);
+    expect(conv.at(-1)).toEqual({ role: 'user', content: '[respondendo à mensagem: "Protetor ou bico?"] esse' });
+  });
+
+  it('marca quando o cliente volta depois de horas', () => {
+    const conv = toConversation([
+      at('2026-10-14T12:00:00Z', msg('1', 'customer', 'quero protetor')),
+      at('2026-10-14T12:01:00Z', msg('2', 'ai', 'Quantos?')),
+      at('2026-10-16T12:00:00Z', msg('3', 'customer', '500')),
+    ]);
+    expect(conv.at(-1)).toEqual({ role: 'user', content: '[o cliente voltou a escrever 2 dias depois] 500' });
+  });
+});

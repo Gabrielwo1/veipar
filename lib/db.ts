@@ -31,7 +31,12 @@ export async function registerInbound(e: InboundEvent): Promise<InboundResult> {
     p_ad_headline: e.ad?.headline ?? null,
   });
   if (error) throw new Error(`register_inbound: ${error.message}`);
-  return (data as InboundResult[])[0];
+  const result = (data as InboundResult[])[0];
+  if (e.replyTo && !result.duplicate) {
+    const { error: replyErr } = await db().from('messages').update({ reply_to: e.replyTo }).eq('id', e.messageId);
+    if (replyErr) console.error('reply_to', replyErr.message);
+  }
+  return result;
 }
 
 export async function registerOutbound(e: OutboundEvent): Promise<void> {
@@ -61,6 +66,7 @@ export interface ChatMessage {
   type: string;
   body: string | null;
   sent_at: string;
+  reply_to?: string | null;
 }
 
 export interface ChatState {
@@ -99,7 +105,7 @@ export async function getChatState(waId: string): Promise<ChatState | null> {
 export async function getMessages(waId: string, limit = 60): Promise<ChatMessage[]> {
   const { data, error } = await db()
     .from('messages')
-    .select('id, author, type, body, sent_at')
+    .select('id, author, type, body, sent_at, reply_to')
     .eq('wa_id', waId)
     .order('created_at', { ascending: false })
     .order('id', { ascending: false })

@@ -12,6 +12,8 @@ export interface InboundEvent {
   type: string;
   text: string | null;
   sentAt: Date;
+  /** messageId da mensagem citada, quando o cliente usa "responder" no WhatsApp. */
+  replyTo: string | null;
   /** Preenchido quando a conversa veio de um anúncio Click-to-WhatsApp. */
   ad: { sourceId: string; headline: string | null } | null;
 }
@@ -82,6 +84,7 @@ export function parseWebhook(p: any): WebhookEvent | null {
     kind: 'inbound',
     ...base,
     name: p.senderName || p.chatName || null,
+    replyTo: p.referenceMessageId ? String(p.referenceMessageId) : null,
     ad: ad?.sourceId ? { sourceId: String(ad.sourceId), headline: ad.title || ad.body || null } : null,
   };
 }

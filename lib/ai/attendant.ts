@@ -56,12 +56,37 @@ function render(m: ChatMessage): string {
   return m.body ? `[cliente enviou ${what} com a legenda: ${m.body}]` : `[cliente enviou ${what}]`;
 }
 
-/** Histórico do banco no formato de chat: cliente = user; IA e equipe = assistant. */
+const HOUR = 3_600_000;
+
+function gap(ms: number): string {
+  const h = Math.round(ms / HOUR);
+  return h < 24 ? `${h} hora${h > 1 ? 's' : ''}` : `${Math.round(h / 24)} dia${h >= 48 ? 's' : ''}`;
+}
+
+/**
+ * Histórico do banco no formato de chat: cliente = user; IA e equipe = assistant.
+ * Marca mensagens citadas ("responder" do WhatsApp) e retomadas depois de horas sem conversa,
+ * para a IA continuar de onde parou em vez de recomeçar o atendimento.
+ */
 export function toConversation(history: ChatMessage[]): Turn[] {
+  const byId = new Map(history.map((m) => [m.id, m]));
   const out: Turn[] = [];
+  let prevAt: number | null = null;
   for (const m of history) {
     const role = m.author === 'customer' ? 'user' : 'assistant';
-    const text = m.author === 'human' ? `[vendedor da equipe] ${m.body ?? ''}` : render(m);
+    let text = m.author === 'human' ? `[vendedor da equipe] ${m.body ?? ''}` : render(m);
+    const at = new Date(m.sent_at).getTime();
+    if (role === 'user' && m.reply_to) {
+      const quoted = byId.get(m.reply_to);
+      const who = quoted?.author === 'customer' ? 'à própria mensagem' : 'à mensagem';
+      text = quoted?.body
+        ? `[respondendo ${who}: "${quoted.body.slice(0, 200)}"] ${text}`
+        : `[respondendo a uma mensagem anterior] ${text}`;
+    }
+    if (role === 'user' && prevAt != null && at - prevAt >= 6 * HOUR) {
+      text = `[o cliente voltou a escrever ${gap(at - prevAt)} depois] ${text}`;
+    }
+    prevAt = at;
     const last = out[out.length - 1];
     if (last?.role === role) last.content = `${last.content}\n${text}`;
     else out.push({ role, content: text });

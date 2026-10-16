@@ -26,6 +26,12 @@ const received = {
 };
 
 describe('parseWebhook (Z-API)', () => {
+  it('guarda a mensagem citada (responder)', () => {
+    const e = parseWebhook({ ...received, referenceMessageId: 'Q1' }) as InboundEvent;
+    expect(e.replyTo).toBe('Q1');
+    expect((parseWebhook(received) as InboundEvent).replyTo).toBeNull();
+  });
+
   it('extrai mensagem recebida com nome, linha e anúncio', () => {
     const e = parseWebhook(received) as InboundEvent;
     expect(e).toMatchObject({
