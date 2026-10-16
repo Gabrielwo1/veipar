@@ -92,13 +92,17 @@ export async function getChatState(waId: string): Promise<ChatState | null> {
   return data;
 }
 
-/** Últimas `limit` mensagens da conversa, da mais antiga para a mais recente. */
+/**
+ * Últimas `limit` mensagens da conversa, da mais antiga para a mais recente, na ordem em que chegaram ao sistema
+ * (created_at). O sent_at do cliente vem do celular dele e pode ficar "antes" de uma resposta que a IA já enviou.
+ */
 export async function getMessages(waId: string, limit = 60): Promise<ChatMessage[]> {
   const { data, error } = await db()
     .from('messages')
     .select('id, author, type, body, sent_at')
     .eq('wa_id', waId)
-    .order('sent_at', { ascending: false })
+    .order('created_at', { ascending: false })
+    .order('id', { ascending: false })
     .limit(limit);
   if (error) throw new Error(`getMessages: ${error.message}`);
   return (data as ChatMessage[]).reverse();
@@ -120,4 +124,20 @@ export async function handoff(waId: string, summary: Record<string, unknown>) {
     .update({ ai_enabled: false, handoff_at: new Date().toISOString(), handoff_summary: summary })
     .eq('wa_id', waId);
   if (error) throw new Error(`handoff: ${error.message}`);
+}
+
+/**
+ * Cliente cadastrado à mão (venda fora do WhatsApp). Com telefone, reaproveita o contato se ele já existir.
+ * Sem telefone, recebe um id "m<timestamp>".
+ */
+export async function upsertManualContact(name: string, phone: string, at: string): Promise<string> {
+  const waId = phone || `m${Date.now()}`;
+  const { error } = await db()
+    .from('contacts')
+    .upsert(
+      { wa_id: waId, name, source: 'manual', ai_enabled: false, first_seen_at: at, last_message_at: at },
+      { onConflict: 'wa_id', ignoreDuplicates: true },
+    );
+  if (error) throw new Error(`upsertManualContact: ${error.message}`);
+  return waId;
 }

@@ -3,6 +3,7 @@ export interface Sale {
   wa_id: string;
   amount: number | string;
   sold_at: string;
+  note?: string | null;
 }
 
 export interface SaleWithContact extends Sale {
@@ -12,6 +13,8 @@ export interface SaleWithContact extends Sale {
 export interface Contact {
   wa_id: string;
   name: string | null;
+  /** 'manual' = cliente cadastrado à mão (venda fora do WhatsApp). wa_id "m…" quando sem telefone. */
+  source: 'whatsapp' | 'manual';
   line: string | null;
   first_seen_at: string;
   last_message_at: string;
@@ -78,6 +81,8 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 export const api = {
   dashboard: (days: number) => request<DashboardData>(`/api/contacts?days=${days}`),
   addSale: (body: { wa_id: string; amount: string; sold_at?: string }) =>
+    request<{ sale: Sale }>('/api/sales', { method: 'POST', body: JSON.stringify(body) }),
+  addManualSale: (body: { name: string; phone?: string; amount: string; sold_at?: string; note?: string }) =>
     request<{ sale: Sale }>('/api/sales', { method: 'POST', body: JSON.stringify(body) }),
   deleteSale: (id: number) => request<{ ok: true }>(`/api/sales?id=${id}`, { method: 'DELETE' }),
   messages: (waId: string) => request<{ messages: ChatMessage[] }>(`/api/messages?wa_id=${waId}`),

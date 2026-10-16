@@ -135,36 +135,44 @@ export async function generateReply(turns: Turn[], context: string): Promise<{ r
   return { replies, summary };
 }
 
-/** Há mensagem mais nova que `messageId`, do cliente ou da equipe? Então esta execução não responde. */
-async function superseded(waId: string, messageId: string): Promise<boolean> {
-  const [latest] = await getMessages(waId, 1);
-  return !!latest && latest.id !== messageId && latest.author !== 'ai';
-}
-
 /**
  * Responde o cliente com a atendente de IA. Chamado pelo webhook depois de gravar a mensagem `messageId`.
  * Espera alguns segundos para juntar mensagens em sequência; só a execução da última mensagem responde.
  */
 export async function runAttendant(waId: string, messageId: string): Promise<void> {
+  const t0 = Date.now();
   await sleep(env.aiDebounceMs);
 
-  const state = await getChatState(waId);
+  const [state, history] = await Promise.all([getChatState(waId), getMessages(waId)]);
   if (!state?.ai_enabled || state.handoff_at) return;
-  if (await superseded(waId, messageId)) return;
+  // Chegou outra mensagem do cliente (ou a equipe respondeu) depois desta: quem responde é a execução dela.
+  const latest = history.at(-1);
+  if (latest && latest.id !== messageId && latest.author !== 'ai') return;
 
-  const turns = toConversation(await getMessages(waId));
+  const turns = toConversation(history);
   if (turns.at(-1)?.role !== 'user') return;
+  const tDb = Date.now();
 
   const context = `Agora: ${new Date().toLocaleString('pt-BR', { timeZone: env.timezone })}. Nome no perfil do WhatsApp: ${state.name || 'não informado'}.`;
   const { replies, summary } = await generateReply(turns, context);
+  const tAi = Date.now();
   if (summary) await handoff(waId, summary);
 
   if (!replies.length) return;
-  if (!summary && (await superseded(waId, messageId))) return; // cliente mandou mais coisa enquanto a IA pensava
+  if (!summary) {
+    const [last] = await getMessages(waId, 1);
+    if (last && last.id !== latest?.id && last.author !== 'ai') return; // cliente mandou mais coisa enquanto a IA pensava
+  }
 
-  for (const bubble of replies.flatMap(toBubbles)) {
-    const typing = Math.min(6, Math.max(2, Math.round(bubble.length / 40)));
+  const bubbles = replies.flatMap(toBubbles);
+  for (const [i, bubble] of bubbles.entries()) {
+    // O cliente já esperou a IA pensar: o 1º balão sai quase na hora; os seguintes simulam a digitação.
+    const typing = i === 0 ? 1 : Math.min(3, Math.max(1, Math.round(bubble.length / 60)));
     const id = await sendText(waId, bubble, typing);
     await registerSent(waId, id, 'ai', bubble);
   }
+  console.log(JSON.stringify({
+    ai: waId.slice(-4), debounce_ms: env.aiDebounceMs, db_ms: tDb - t0 - env.aiDebounceMs,
+    model_ms: tAi - tDb, send_ms: Date.now() - tAi, total_ms: Date.now() - t0, bubbles: bubbles.length, handoff: !!summary,
+  }));
 }

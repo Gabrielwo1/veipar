@@ -35,7 +35,8 @@ export const fmtDate = (d: string | number | Date) =>
 export const fmtTime = (d: string | number | Date) => dtf('pt-BR', { hour: '2-digit', minute: '2-digit' }).format(new Date(d));
 
 export function fmtPhone(waId: string) {
-  const d = waId.replace(/\D/g, '');
+  if (!/^\d+$/.test(waId)) return 'Sem telefone'; // cliente manual sem telefone
+  const d = waId;
   if (d.startsWith('55') && (d.length === 12 || d.length === 13)) {
     const num = d.slice(4), s = num.length - 4;
     return `(${d.slice(2, 4)}) ${num.slice(0, s)}-${num.slice(s)}`;

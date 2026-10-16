@@ -13,7 +13,7 @@ export async function GET(request: Request): Promise<Response> {
     db()
       .from('contacts')
       .select(
-        'wa_id, name, line, first_seen_at, last_message_at, message_count, first_reply_at, last_reply_at, ad_source_id, ad_headline, ai_enabled, handoff_at, handoff_summary, last_preview, sales(id, amount, sold_at)',
+        'wa_id, name, source, line, first_seen_at, last_message_at, message_count, first_reply_at, last_reply_at, ad_source_id, ad_headline, ai_enabled, handoff_at, handoff_summary, last_preview, sales(id, amount, sold_at, note)',
       )
       .gte('last_message_at', since)
       .order('last_message_at', { ascending: false })

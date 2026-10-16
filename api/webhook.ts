@@ -33,6 +33,7 @@ export async function POST(request: Request): Promise<Response> {
 
   try {
     if (event.kind === 'inbound') {
+      console.log(JSON.stringify({ inbound: event.waId.slice(-4), zapi_delay_ms: Date.now() - event.sentAt.getTime() }));
       const result = await registerInbound(event);
       if (!result.duplicate && result.should_notify && env.managerPhones.length + env.notifyGroupIds.length > 0) {
         await notifyManagers(event, result.is_new);

@@ -45,19 +45,21 @@ const initials = (name: string | null) =>
 interface Props {
   contacts: Contact[];
   aiOn: boolean;
+  selected: string | null;
+  onSelect: (waId: string | null) => void;
   onContactChange: (waId: string, patch: Partial<Contact>) => void;
   onError: (e: unknown, prefix: string) => void;
 }
 
-export function Conversations({ contacts, aiOn, onContactChange, onError }: Props) {
+export function Conversations({ contacts, aiOn, selected, onSelect: setSelected, onContactChange, onError }: Props) {
   const [filter, setFilter] = useState<Filter>('all');
   const [query, setQuery] = useState('');
-  const [selected, setSelected] = useState<string | null>(null);
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
     const digits = q.replace(/\D/g, '');
     return contacts
+      .filter((c) => c.message_count > 0 || c.wa_id === selected) // clientes manuais só aparecem se abertos pela tabela
       .filter((c) =>
         filter === 'waiting' ? isWaiting(c)
           : filter === 'ai' ? c.ai_enabled && !c.handoff_at
@@ -65,7 +67,7 @@ export function Conversations({ contacts, aiOn, onContactChange, onError }: Prop
               : true)
       .filter((c) => !q || (c.name ?? '').toLowerCase().includes(q) || (digits && c.wa_id.includes(digits)))
       .sort((a, b) => b.last_message_at.localeCompare(a.last_message_at));
-  }, [contacts, filter, query]);
+  }, [contacts, filter, query, selected]);
 
   const waitingCount = useMemo(() => contacts.filter(isWaiting).length, [contacts]);
   const contact = contacts.find((c) => c.wa_id === selected) ?? null;

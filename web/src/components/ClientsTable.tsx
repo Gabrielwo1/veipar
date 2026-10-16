@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ArrowDown, ArrowUp, ChevronsUpDown, Download, History, Loader2, Megaphone, Plus, Search } from 'lucide-react';
+import { ArrowDown, ArrowUp, ChevronsUpDown, Download, History, Loader2, Megaphone, MessagesSquare, PenLine, Plus, Search } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -7,23 +7,14 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { brand } from '@/brand';
 import type { Contact } from '@/lib/api';
 import { brl, dayKey, fmtDate, fmtPhone, fmtTime, int, plural } from '@/lib/format';
-import { isWaiting, replyMs, totalOf } from '@/lib/metrics';
+import { hasPhone, isManual, isWaiting, replyMs, totalOf } from '@/lib/metrics';
 import { cn } from '@/lib/utils';
 
 type SortKey = 'last' | 'name' | 'total';
 type Status = 'all' | 'wait' | 'sold' | 'nosale' | 'ad';
 const PAGE = 25;
-
-function WhatsAppIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className={className} fill="currentColor">
-      <path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z" />
-    </svg>
-  );
-}
 
 function initials(name: string | null) {
   const parts = (name ?? '').trim().split(/\s+/).filter(Boolean);
@@ -70,9 +61,12 @@ interface Props {
   lines: Record<string, string>;
   onAdd: (c: Contact, amount: string) => Promise<boolean>;
   onOpenSales: (c: Contact) => void;
+  /** Abre a conversa do cliente na aba Conversas. */
+  onOpenChat: (c: Contact) => void;
+  onNewManual: () => void;
 }
 
-export function ClientsTable({ contacts, lines, onAdd, onOpenSales }: Props) {
+export function ClientsTable({ contacts, lines, onAdd, onOpenSales, onOpenChat, onNewManual }: Props) {
   const [q, setQ] = useState('');
   const [status, setStatus] = useState<Status>('all');
   const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 }>({ key: 'last', dir: -1 });
@@ -118,7 +112,7 @@ export function ClientsTable({ contacts, lines, onAdd, onOpenSales }: Props) {
     const head = ['ultima_mensagem', 'primeiro_contato', 'nome', 'telefone', 'linha', 'origem', 'anuncio', 'mensagens', 'vendas', 'total_vendido', 'primeira_resposta_min'];
     const body = rows.map((c) => [
       c.last_message_at, c.first_seen_at, c.name ?? '', c.wa_id, lines[c.line ?? ''] ?? c.line ?? '',
-      c.ad_source_id ? 'anuncio' : 'organico', c.ad_headline ?? '', c.message_count, c.sales?.length ?? 0,
+      isManual(c) ? 'manual' : c.ad_source_id ? 'anuncio' : 'organico', c.ad_headline ?? '', c.message_count, c.sales?.length ?? 0,
       totalOf(c).toFixed(2).replace('.', ','), replyMs(c) == null ? '' : Math.round(replyMs(c)! / 60000),
     ].map((v) => `"${String(v).replace(/"/g, '""')}"`).join(';'));
     const blob = new Blob(['﻿' + [head.join(';'), ...body].join('\n')], { type: 'text/csv;charset=utf-8' });
@@ -151,6 +145,7 @@ export function ClientsTable({ contacts, lines, onAdd, onOpenSales }: Props) {
           </SelectContent>
         </Select>
         <Button variant="outline" onClick={exportCsv}><Download />CSV</Button>
+        <Button onClick={onNewManual}><Plus />Venda manual</Button>
       </div>
 
       <Table className="min-w-[1040px]">
@@ -169,8 +164,6 @@ export function ClientsTable({ contacts, lines, onAdd, onOpenSales }: Props) {
         <TableBody>
           {rows.slice(0, limit).map((c) => {
             const total = totalOf(c);
-            const first = (c.name ?? '').trim().split(/\s+/)[0];
-            const msg = encodeURIComponent(brand.greeting(first));
             const isToday = dayKey(c.last_message_at) === today;
             return (
               <TableRow key={c.wa_id} className="group">
@@ -193,7 +186,9 @@ export function ClientsTable({ contacts, lines, onAdd, onOpenSales }: Props) {
                 </TableCell>
                 <TableCell className="tabular text-graphite">{fmtPhone(c.wa_id)}</TableCell>
                 <TableCell>
-                  {c.ad_source_id ? (
+                  {isManual(c) ? (
+                    <Badge variant="outline" className="gap-1 text-graphite"><PenLine className="size-3" />Manual</Badge>
+                  ) : c.ad_source_id ? (
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Badge variant="outline" className="gap-1 border-primary/15 bg-primary/[0.04] text-foreground"><Megaphone className="size-3" />Anúncio</Badge>
@@ -213,11 +208,12 @@ export function ClientsTable({ contacts, lines, onAdd, onOpenSales }: Props) {
                 </TableCell>
                 <TableCell><SaleInput c={c} onAdd={onAdd} /></TableCell>
                 <TableCell className="pr-5 text-right">
-                  <Button asChild size="sm" className="bg-[#1fa855] text-white shadow-sm shadow-[#1fa855]/30 hover:bg-[#1a9049]">
-                    <a href={`https://wa.me/${c.wa_id}?text=${msg}`} target="_blank" rel="noopener noreferrer" aria-label={`Chamar ${c.name || fmtPhone(c.wa_id)} no WhatsApp`}>
-                      <WhatsAppIcon className="size-4" />Chamar
-                    </a>
-                  </Button>
+                  {hasPhone(c) && (
+                    <Button size="sm" onClick={() => onOpenChat(c)} className="bg-[#1fa855] text-white shadow-sm shadow-[#1fa855]/30 hover:bg-[#1a9049]"
+                      aria-label={`Abrir conversa com ${c.name || fmtPhone(c.wa_id)}`}>
+                      <MessagesSquare className="size-4" />Conversar
+                    </Button>
+                  )}
                 </TableCell>
               </TableRow>
             );

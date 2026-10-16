@@ -43,7 +43,7 @@ export const env = {
   get aiEnabled() { return process.env.AI_ENABLED !== 'false' && !!process.env.OPENAI_API_KEY; },
   get aiModel() { return process.env.AI_MODEL || 'gpt-5.5'; },
   /** Espera antes de responder, para juntar mensagens enviadas em sequência pelo cliente. */
-  get aiDebounceMs() { return Number(process.env.AI_DEBOUNCE_SECONDS ?? 8) * 1000; },
+  get aiDebounceMs() { return Number(process.env.AI_DEBOUNCE_SECONDS ?? 3) * 1000; },
 
   // Banco
   get supabaseUrl() { return required('SUPABASE_URL'); },

@@ -3,7 +3,7 @@
   "framework": null,
   "outputDirectory": "dist",
   "regions": [
-    "gru1"
+    "cle1"
   ],
   "functions": {
     "api/**/*.ts": {

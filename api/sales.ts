@@ -1,4 +1,4 @@
-import { db } from '../lib/db.js';
+import { db, upsertManualContact } from '../lib/db.js';
 import { authorized, json } from '../lib/http.js';
 
 /** Converte "1.234,56", "150,5" ou 150.5 em número com 2 casas. */
@@ -11,23 +11,47 @@ export function parseAmount(input: unknown): number | null {
   return Number.isFinite(n) && n > 0 && n < 10_000_000 ? Math.round(n * 100) / 100 : null;
 }
 
-/** Registra uma venda para um contato. Body: { wa_id, amount, sold_at? } */
+/** Telefone em dígitos com DDI 55 (aceita "(46) 99123-3498"). Vazio se não informado. */
+export function normalizePhone(input: unknown): string {
+  const d = String(input ?? '').replace(/\D/g, '');
+  if (!d) return '';
+  return d.length === 10 || d.length === 11 ? `55${d}` : d;
+}
+
+/**
+ * Registra uma venda.
+ * - Cliente do WhatsApp: { wa_id, amount, sold_at? }
+ * - Venda manual (fora do WhatsApp): { name, phone?, amount, sold_at?, note? } — cria o cliente se precisar.
+ */
 export async function POST(request: Request): Promise<Response> {
   if (!authorized(request)) return json({ error: 'unauthorized' }, 401);
 
   const body = await request.json().catch(() => null);
-  const waId = String(body?.wa_id ?? '').replace(/\D/g, '');
+  const manual = !body?.wa_id;
+  const name = String(body?.name ?? '').trim().slice(0, 120);
+  const phone = normalizePhone(body?.phone);
   const amount = parseAmount(body?.amount);
   const soldAt = body?.sold_at ? new Date(body.sold_at) : new Date();
+  const note = String(body?.note ?? '').trim().slice(0, 500) || null;
 
-  if (!waId || amount == null || Number.isNaN(soldAt.getTime())) {
-    return json({ error: 'Informe wa_id e um valor maior que zero.' }, 400);
+  if (amount == null || Number.isNaN(soldAt.getTime())) return json({ error: 'Informe um valor maior que zero.' }, 400);
+  if (manual && !name) return json({ error: 'Informe o nome do cliente.' }, 400);
+  if (phone && !/^\d{10,15}$/.test(phone)) return json({ error: 'Telefone inválido.' }, 400);
+
+  let waId = String(body?.wa_id ?? '').replace(/\D/g, '');
+  if (manual) {
+    try {
+      waId = await upsertManualContact(name, phone, soldAt.toISOString());
+    } catch (err) {
+      return json({ error: err instanceof Error ? err.message : String(err) }, 500);
+    }
   }
+  if (!waId) return json({ error: 'Informe wa_id e um valor maior que zero.' }, 400);
 
   const { data, error } = await db()
     .from('sales')
-    .insert({ wa_id: waId, amount, sold_at: soldAt.toISOString() })
-    .select('id, wa_id, amount, sold_at')
+    .insert({ wa_id: waId, amount, sold_at: soldAt.toISOString(), note })
+    .select('id, wa_id, amount, sold_at, note')
     .single();
 
   if (error) return json({ error: error.message }, error.code === '23503' ? 404 : 500);

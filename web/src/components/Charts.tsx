@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent, type ChartConfig,
+  ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig,
 } from '@/components/ui/chart';
 import { brl, brlCompact, int, plural } from '@/lib/format';
 import type { Dashboard, Period } from '@/lib/metrics';
@@ -24,15 +24,15 @@ function ChartCard({ title, description, aside, className, children }: {
   title: string; description: string; aside?: ReactNode; className?: string; children: ReactNode;
 }) {
   return (
-    <Card className={cn('gap-4 py-5', className)}>
-      <CardHeader className="flex flex-row items-start justify-between gap-4 px-5">
-        <div className="space-y-1">
-          <CardTitle className="text-[15px]">{title}</CardTitle>
-          <CardDescription>{description}</CardDescription>
+    <Card className={cn('gap-2 py-4', className)}>
+      <CardHeader className="flex flex-row items-start justify-between gap-3 px-4">
+        <div className="min-w-0 space-y-0.5">
+          <CardTitle className="text-sm">{title}</CardTitle>
+          <CardDescription className="truncate text-xs">{description}</CardDescription>
         </div>
         {aside}
       </CardHeader>
-      <CardContent className="px-3 sm:px-5">{children}</CardContent>
+      <CardContent className="px-2 sm:px-4">{children}</CardContent>
     </Card>
   );
 }
@@ -50,18 +50,18 @@ export function Charts({ d, period }: { d: Dashboard; period: Period }) {
   const originData = d.origin.map((o) => ({ ...o, fill: `var(--color-${o.key})` }));
 
   return (
-    <section className="grid gap-3 lg:grid-cols-3">
+    <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
       <ChartCard
-        className="lg:col-span-2" title="Faturamento" description={`Vendas lançadas, em R$ ${unit}`}
-        aside={<div className="text-right"><div className="text-lg font-semibold tabular">{brl(d.cur.revenue)}</div>
+        title="Faturamento" description={`Vendas lançadas, em R$ ${unit}`}
+        aside={<div className="text-right"><div className="text-base font-semibold tabular">{brl(d.cur.revenue)}</div>
           <div className="text-xs text-muted-foreground">{plural(salesInPeriod, 'venda', 'vendas')}</div></div>}
       >
         <div className="relative">
-          <ChartContainer config={revenueConfig} className="aspect-auto h-[260px] w-full">
+          <ChartContainer config={revenueConfig} className="aspect-auto h-[140px] w-full">
             <BarChart data={d.timeline} margin={{ left: 4, right: 8, top: 8 }}>
               <CartesianGrid vertical={false} strokeDasharray="3 3" />
-              <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={8} minTickGap={16} interval={interval} />
-              <YAxis tickLine={false} axisLine={false} width={64} tickFormatter={brlCompact} />
+              <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={6} minTickGap={16} interval={interval} tick={{ fontSize: 11 }} />
+              <YAxis tickLine={false} axisLine={false} width={52} tickFormatter={brlCompact} tick={{ fontSize: 11 }} />
               <ChartTooltip
                 cursor={{ fill: 'var(--muted)' }}
                 content={<ChartTooltipContent
@@ -83,8 +83,8 @@ export function Charts({ d, period }: { d: Dashboard; period: Period }) {
       </ChartCard>
 
       <ChartCard title="Faturamento por origem" description="Click-to-WhatsApp × orgânico">
-        <ChartContainer config={originConfig} className="aspect-auto h-[150px] w-full">
-          <BarChart data={originData} layout="vertical" margin={{ left: 0, right: 92 }} barCategoryGap={18}>
+        <ChartContainer config={originConfig} className="aspect-auto h-[84px] w-full">
+          <BarChart data={originData} layout="vertical" margin={{ left: 0, right: 92 }} barCategoryGap={10}>
             <YAxis dataKey="origem" type="category" tickLine={false} axisLine={false} width={72} />
             <XAxis type="number" hide />
             <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel nameKey="key"
@@ -99,30 +99,29 @@ export function Charts({ d, period }: { d: Dashboard; period: Period }) {
             </Bar>
           </BarChart>
         </ChartContainer>
-        <div className="mt-3 grid grid-cols-2 gap-2">
+        <div className="mt-1 grid grid-cols-2 gap-2">
           {d.origin.map((o) => (
-            <div key={o.key} className="rounded-lg border bg-muted/40 p-3">
+            <div key={o.key} className="rounded-lg border bg-muted/40 px-2.5 py-1.5">
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <span className="size-2 rounded-sm" style={{ background: `var(--chart-${o.key === 'anuncio' ? 1 : 2})` }} />{o.origem}
               </div>
-              <div className="mt-1 text-sm font-semibold tabular">{o.vendas ? brl(o.receita / o.vendas) : '—'}</div>
+              <div className="text-sm font-semibold tabular">{o.vendas ? brl(o.receita / o.vendas) : '—'}</div>
               <div className="text-[11px] text-muted-foreground">ticket médio · {plural(o.vendas, 'venda', 'vendas')}</div>
             </div>
           ))}
         </div>
       </ChartCard>
 
-      <ChartCard className="lg:col-span-2" title="Novos contatos" description={`Primeira mensagem ${unit}, por origem`}
-        aside={<div className="text-right"><div className="text-lg font-semibold tabular">{int(newTotal)}</div>
+      <ChartCard title="Novos contatos" description={`Primeira mensagem ${unit}`}
+        aside={<div className="text-right"><div className="text-base font-semibold tabular">{int(newTotal)}</div>
           <div className="text-xs text-muted-foreground">no período</div></div>}>
         <div className="relative">
-          <ChartContainer config={contactsConfig} className="aspect-auto h-[240px] w-full">
+          <ChartContainer config={contactsConfig} className="aspect-auto h-[140px] w-full">
             <BarChart data={d.timeline} margin={{ left: 4, right: 8, top: 8 }}>
               <CartesianGrid vertical={false} strokeDasharray="3 3" />
-              <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={8} minTickGap={16} interval={interval} />
-              <YAxis tickLine={false} axisLine={false} width={32} allowDecimals={false} />
+              <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={6} minTickGap={16} interval={interval} tick={{ fontSize: 11 }} />
+              <YAxis tickLine={false} axisLine={false} width={24} allowDecimals={false} tick={{ fontSize: 11 }} />
               <ChartTooltip cursor={{ fill: 'var(--muted)' }} content={<ChartTooltipContent labelFormatter={(_, p) => p?.[0]?.payload?.tip} />} />
-              <ChartLegend content={<ChartLegendContent />} />
               <Bar dataKey="organico" stackId="a" fill="var(--color-organico)" radius={[4, 4, 0, 0]} stroke="var(--card)" strokeWidth={1} maxBarSize={36} />
               <Bar dataKey="anuncio" stackId="a" fill="var(--color-anuncio)" radius={[4, 4, 0, 0]} stroke="var(--card)" strokeWidth={1} maxBarSize={36} />
             </BarChart>
@@ -133,11 +132,11 @@ export function Charts({ d, period }: { d: Dashboard; period: Period }) {
 
       <ChartCard title="Horário dos contatos" description="Novos contatos por hora do dia">
         <div className="relative">
-          <ChartContainer config={hoursConfig} className="aspect-auto h-[240px] w-full">
+          <ChartContainer config={hoursConfig} className="aspect-auto h-[140px] w-full">
             <BarChart data={d.hours} margin={{ left: 0, right: 4, top: 8 }}>
               <CartesianGrid vertical={false} strokeDasharray="3 3" />
-              <XAxis dataKey="hora" tickLine={false} axisLine={false} tickMargin={8} interval={3} />
-              <YAxis tickLine={false} axisLine={false} width={28} allowDecimals={false} />
+              <XAxis dataKey="hora" tickLine={false} axisLine={false} tickMargin={6} interval={5} tick={{ fontSize: 11 }} />
+              <YAxis tickLine={false} axisLine={false} width={24} allowDecimals={false} tick={{ fontSize: 11 }} />
               <ChartTooltip cursor={{ fill: 'var(--muted)' }} content={<ChartTooltipContent />} />
               <Bar dataKey="contatos" fill="var(--color-contatos)" radius={[4, 4, 0, 0]} />
             </BarChart>

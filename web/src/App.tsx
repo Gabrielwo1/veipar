@@ -7,9 +7,10 @@ import { Conversations } from '@/components/Conversations';
 import { Header, type View } from '@/components/Header';
 import { KpiCards } from '@/components/KpiCards';
 import { Login } from '@/components/Login';
+import { ManualSaleDialog, type ManualSale } from '@/components/ManualSaleDialog';
 import { SalesDialog } from '@/components/SalesDialog';
 import { api, session, UnauthorizedError, type Contact, type DashboardData } from '@/lib/api';
-import { brl, fmtPhone, setTimezone } from '@/lib/format';
+import { brl, dayKey, fmtPhone, setTimezone } from '@/lib/format';
 import { computeDashboard, fetchDays, type Period } from '@/lib/metrics';
 
 const PERIOD_KEY = 'vf_period';
@@ -28,6 +29,8 @@ export default function App() {
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [salesFor, setSalesFor] = useState<string | null>(null);
   const [view, setView] = useState<View>(readView);
+  const [chatWith, setChatWith] = useState<string | null>(null);
+  const [manualOpen, setManualOpen] = useState(false);
 
   const logout = useCallback((msg?: string) => {
     session.set(''); setAuthed(false); setData(null); setLoginError(msg);
@@ -102,6 +105,23 @@ export default function App() {
     }
   }
 
+  async function addManualSale(f: ManualSale) {
+    try {
+      const { sale } = await api.addManualSale({
+        name: f.name.trim(), phone: f.phone, amount: f.amount, note: f.note,
+        ...(f.date !== dayKey(Date.now()) ? { sold_at: `${f.date}T12:00:00-03:00` } : {}),
+      });
+      toast.success(`Venda de ${brl(Number(sale.amount))} lançada`, { description: f.name.trim() });
+      load();
+      return true;
+    } catch (e) {
+      handleError(e, 'Não foi possível lançar');
+      return false;
+    }
+  }
+
+  const changeView = (v: View) => { setView(v); try { localStorage.setItem(VIEW_KEY, v); } catch { /* sem storage */ } };
+
   if (!authed) {
     return <Login error={loginError} onSubmit={(pwd) => { session.set(pwd); setLoginError(undefined); setAuthed(true); }} />;
   }
@@ -110,14 +130,17 @@ export default function App() {
     <div className="min-h-svh">
       <Header
         view={view} waiting={waiting}
-        onView={(v) => { setView(v); try { localStorage.setItem(VIEW_KEY, v); } catch { /* sem storage */ } }}
+        onView={changeView}
         period={period}
         onPeriod={(p) => { setPeriod(p); try { localStorage.setItem(PERIOD_KEY, String(p)); } catch { /* sem storage */ } }}
         updatedAt={updatedAt} loading={loading} onRefresh={load} onLogout={() => logout()}
       />
       <main className="mx-auto flex max-w-[1400px] flex-col gap-4 px-4 py-6 sm:px-6">
         {view === 'conversas' && data ? (
-          <Conversations contacts={data.contacts} aiOn={data.ai} onContactChange={patchContact} onError={handleError} />
+          <Conversations
+            contacts={data.contacts} aiOn={data.ai} selected={chatWith} onSelect={setChatWith}
+            onContactChange={patchContact} onError={handleError}
+          />
         ) : !dashboard ? (
           <div className="grid gap-3">
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-6">
@@ -130,10 +153,14 @@ export default function App() {
           <>
             <KpiCards d={dashboard} period={period} />
             <Charts d={dashboard} period={period} />
-            <ClientsTable contacts={dashboard.contacts} lines={data!.lines} onAdd={(c, a) => addSale(c, a)} onOpenSales={(c) => setSalesFor(c.wa_id)} />
+            <ClientsTable contacts={dashboard.contacts} lines={data!.lines} onAdd={(c, a) => addSale(c, a)} onOpenSales={(c) => setSalesFor(c.wa_id)}
+              onOpenChat={(c) => { setChatWith(c.wa_id); changeView('conversas'); }}
+              onNewManual={() => setManualOpen(true)}
+            />
           </>
         )}
       </main>
+      <ManualSaleDialog open={manualOpen} onClose={() => setManualOpen(false)} onSave={addManualSale} />
       <SalesDialog contact={salesContact} onClose={() => setSalesFor(null)} onAdd={addSale} onDelete={deleteSale} />
     </div>
   );
