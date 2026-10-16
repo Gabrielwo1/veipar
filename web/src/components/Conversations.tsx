@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { api, type ChatMessage, type Contact } from '@/lib/api';
 import { dayKey, fmtDate, fmtPhone, fmtTime } from '@/lib/format';
+import { lastActivity } from '@/lib/metrics';
 import { cn } from '@/lib/utils';
 
 type Filter = 'all' | 'waiting' | 'ai' | 'team';
@@ -59,14 +60,14 @@ export function Conversations({ contacts, aiOn, selected, onSelect: setSelected,
     const q = query.trim().toLowerCase();
     const digits = q.replace(/\D/g, '');
     return contacts
-      .filter((c) => c.message_count > 0 || c.wa_id === selected) // clientes manuais só aparecem se abertos pela tabela
+      .filter((c) => c.message_count > 0 || !!c.last_reply_at || c.wa_id === selected) // manual sem conversa só se aberto pela tabela
       .filter((c) =>
         filter === 'waiting' ? isWaiting(c)
           : filter === 'ai' ? c.ai_enabled && !c.handoff_at
             : filter === 'team' ? !c.ai_enabled && !c.handoff_at
               : true)
       .filter((c) => !q || (c.name ?? '').toLowerCase().includes(q) || (digits && c.wa_id.includes(digits)))
-      .sort((a, b) => b.last_message_at.localeCompare(a.last_message_at));
+      .sort((a, b) => lastActivity(b).localeCompare(lastActivity(a)));
   }, [contacts, filter, query, selected]);
 
   const waitingCount = useMemo(() => contacts.filter(isWaiting).length, [contacts]);
@@ -108,7 +109,7 @@ export function Conversations({ contacts, aiOn, selected, onSelect: setSelected,
                     <div className="flex items-baseline justify-between gap-2">
                       <span className="truncate font-medium">{c.name || fmtPhone(c.wa_id)}</span>
                       <span className="shrink-0 text-[11px] text-muted-foreground tabular">
-                        {dayKey(c.last_message_at) === today ? fmtTime(c.last_message_at) : fmtDate(c.last_message_at).slice(0, 5)}
+                        {dayKey(lastActivity(c)) === today ? fmtTime(lastActivity(c)) : fmtDate(lastActivity(c)).slice(0, 5)}
                       </span>
                     </div>
                     <div className="truncate text-sm text-muted-foreground">{c.last_preview ?? '—'}</div>

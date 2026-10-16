@@ -10,6 +10,11 @@ export const totalOf = (c: Contact) => sum(c.sales ?? []);
 export const replyMs = (c: Contact) =>
   c.first_reply_at ? new Date(c.first_reply_at).getTime() - new Date(c.first_seen_at).getTime() : null;
 export const isManual = (c: Contact) => c.source === 'manual';
+/** Contato que chamou no WhatsApp (exclui manual e conversa iniciada pela equipe sem resposta do cliente). */
+export const isLead = (c: Contact) => !isManual(c) && c.message_count > 0;
+/** Última atividade da conversa, de qualquer lado. */
+export const lastActivity = (c: Contact) =>
+  c.last_reply_at && c.last_reply_at > c.last_message_at ? c.last_reply_at : c.last_message_at;
 /** Telefone de verdade (clientes manuais sem telefone têm wa_id "m…"). */
 export const hasPhone = (c: Contact) => /^\d+$/.test(c.wa_id);
 export const isWaiting = (c: Contact) =>
@@ -49,7 +54,7 @@ function stats(sales: SaleWithContact[], contacts: Contact[], inRange: (iso: str
     adRevenue: sum(s.filter((x) => x.contacts?.ad_source_id)),
     salesCount: s.length,
     buyers: new Set(s.map((x) => x.wa_id)).size,
-    newContacts: contacts.filter((c) => !isManual(c) && inRange(c.first_seen_at)).length,
+    newContacts: contacts.filter((c) => isLead(c) && inRange(c.first_seen_at)).length,
   };
 }
 
@@ -62,7 +67,7 @@ export function computeDashboard(data: DashboardData, period: Period, line: stri
   const allSales = data.sales.filter(byLine);
   const contacts = allContacts.filter((c) => win.cur(c.last_message_at) || (c.sales ?? []).some((s) => win.cur(s.sold_at)));
   const sales = allSales.filter((s) => win.cur(s.sold_at));
-  const newContacts = contacts.filter((c) => !isManual(c) && win.cur(c.first_seen_at));
+  const newContacts = contacts.filter((c) => isLead(c) && win.cur(c.first_seen_at));
 
   const cur = stats(allSales, allContacts, win.cur);
   const prev = stats(allSales, allContacts, win.prev);

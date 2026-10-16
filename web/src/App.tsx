@@ -30,6 +30,7 @@ export default function App() {
   const [salesFor, setSalesFor] = useState<string | null>(null);
   const [view, setView] = useState<View>(readView);
   const [chatWith, setChatWith] = useState<string | null>(null);
+  const [chats, setChats] = useState<Contact[] | null>(null);
   const [manualOpen, setManualOpen] = useState(false);
 
   const logout = useCallback((msg?: string) => {
@@ -44,16 +45,18 @@ export default function App() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const d = await api.dashboard(fetchDays(period));
+      // A aba Conversas tem lista própria (últimos 180 dias, independente do período do painel).
+      const [d, c] = await Promise.all([api.dashboard(fetchDays(period)), view === 'conversas' ? api.conversations() : null]);
       setTimezone(d.timezone);
       setData(d);
+      if (c) setChats(c.contacts);
       setUpdatedAt(new Date());
     } catch (e) {
       handleError(e, 'Erro ao carregar');
     } finally {
       setLoading(false);
     }
-  }, [period, handleError]);
+  }, [period, view, handleError]);
 
   useEffect(() => { if (authed) load(); }, [authed, load]);
 
@@ -69,8 +72,15 @@ export default function App() {
 
   const patchContact = useCallback((waId: string, patch: Partial<Contact>) => {
     setData((d) => d && { ...d, contacts: d.contacts.map((c) => (c.wa_id === waId ? { ...c, ...patch } : c)) });
+    setChats((list) => list && list.map((c) => (c.wa_id === waId ? { ...c, ...patch } : c)));
   }, []);
-  const waiting = data?.contacts.filter((c) => c.handoff_at).length ?? 0;
+  const waiting = (chats ?? data?.contacts ?? []).filter((c) => c.handoff_at).length;
+  // Cliente aberto pela tabela pode estar fora da lista de conversas (ex.: venda manual sem mensagens).
+  const chatList = useMemo(() => {
+    const list = chats ?? data?.contacts ?? [];
+    const extra = chatWith && !list.some((c) => c.wa_id === chatWith) ? data?.contacts.find((c) => c.wa_id === chatWith) : undefined;
+    return extra ? [extra, ...list] : list;
+  }, [chats, data, chatWith]);
 
   const dashboard = useMemo(() => (data ? computeDashboard(data, period, '') : null), [data, period]);
   const salesContact = data?.contacts.find((c) => c.wa_id === salesFor) ?? null;
@@ -138,7 +148,7 @@ export default function App() {
       <main className="mx-auto flex max-w-[1400px] flex-col gap-4 px-4 py-6 sm:px-6">
         {view === 'conversas' && data ? (
           <Conversations
-            contacts={data.contacts} aiOn={data.ai} selected={chatWith} onSelect={setChatWith}
+            contacts={chatList} aiOn={data.ai} selected={chatWith} onSelect={setChatWith}
             onContactChange={patchContact} onError={handleError}
           />
         ) : !dashboard ? (

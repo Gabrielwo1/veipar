@@ -85,6 +85,7 @@ export const api = {
   addManualSale: (body: { name: string; phone?: string; amount: string; sold_at?: string; note?: string }) =>
     request<{ sale: Sale }>('/api/sales', { method: 'POST', body: JSON.stringify(body) }),
   deleteSale: (id: number) => request<{ ok: true }>(`/api/sales?id=${id}`, { method: 'DELETE' }),
+  conversations: () => request<{ contacts: Contact[] }>('/api/conversations'),
   messages: (waId: string) => request<{ messages: ChatMessage[] }>(`/api/messages?wa_id=${waId}`),
   send: (waId: string, text: string) =>
     request<{ message: ChatMessage }>('/api/messages', { method: 'POST', body: JSON.stringify({ wa_id: waId, text }) }),
