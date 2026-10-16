@@ -147,3 +147,10 @@ export async function upsertManualContact(name: string, phone: string, at: strin
   if (error) throw new Error(`upsertManualContact: ${error.message}`);
   return waId;
 }
+
+/** Este número já conversava com a equipe antes do sistema? */
+export async function isPreExistingChat(waId: string): Promise<boolean> {
+  const { data, error } = await db().from('pre_existing_chats').select('wa_id').eq('wa_id', waId).maybeSingle();
+  if (error) throw new Error(`isPreExistingChat: ${error.message}`);
+  return !!data;
+}

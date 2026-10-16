@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 import type { FunctionTool, ResponseFunctionToolCall, ResponseInputItem, Response as AIResponse } from 'openai/resources/responses/responses';
 import { env } from '../env.js';
-import { getChatState, getMessages, handoff, registerSent, type ChatMessage } from '../db.js';
+import { getChatState, getMessages, handoff, isPreExistingChat, registerSent, setAiEnabled, type ChatMessage } from '../db.js';
 import { sendText } from '../whatsapp.js';
 import { SYSTEM_PROMPT } from './prompt.js';
 
@@ -170,6 +170,12 @@ export async function runAttendant(waId: string, messageId: string): Promise<voi
 
   const [state, history] = await Promise.all([getChatState(waId), getMessages(waId)]);
   if (!state?.ai_enabled || state.handoff_at) return;
+  // Número que já conversava com a equipe antes do sistema: fica com a equipe.
+  // (Quando a equipe escreve numa conversa, ai_enabled já vira false; só volta pelo botão "Devolver para IA".)
+  if (!history.some((m) => m.author === 'ai') && (await isPreExistingChat(waId))) {
+    await setAiEnabled(waId, false);
+    return;
+  }
   // Chegou outra mensagem do cliente (ou a equipe respondeu) depois desta: quem responde é a execução dela.
   const latest = history.at(-1);
   if (latest && latest.id !== messageId && latest.author !== 'ai') return;

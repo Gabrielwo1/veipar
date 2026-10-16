@@ -32,3 +32,22 @@ export async function listGroups(): Promise<Group[]> {
   const data = (await res.json()) as any[];
   return data.map((g) => ({ phone: String(g.phone), name: String(g.name ?? '') }));
 }
+
+export interface Chat { phone: string; name: string; lastMessageTime: number }
+
+/** Chats individuais do número conectado (para importar quem já conversava com a equipe). */
+export async function listChats(): Promise<Chat[]> {
+  const chats: Chat[] = [];
+  for (let page = 1; page <= 50; page++) {
+    const res = await fetch(instanceUrl(`chats?page=${page}&pageSize=500`), { headers: headers() });
+    if (!res.ok) throw new Error(`Z-API ${res.status}: ${await res.text()}`);
+    const data = (await res.json()) as any[];
+    for (const c of data) {
+      if (!c.isGroup && /^\d{8,15}$/.test(String(c.phone))) {
+        chats.push({ phone: String(c.phone), name: String(c.name ?? ''), lastMessageTime: Number(c.lastMessageTime) || 0 });
+      }
+    }
+    if (data.length < 500) break;
+  }
+  return chats;
+}
