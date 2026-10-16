@@ -14,8 +14,8 @@ type Filter = 'all' | 'waiting' | 'ai' | 'team';
 
 const FILTERS: { value: Filter; label: string }[] = [
   { value: 'all', label: 'Todas' },
-  { value: 'waiting', label: 'Para a equipe' },
-  { value: 'ai', label: 'Com a IA' },
+  { value: 'waiting', label: 'Aguardando' },
+  { value: 'ai', label: 'IA' },
   { value: 'team', label: 'Equipe' },
 ];
 
@@ -81,10 +81,10 @@ export function Conversations({ contacts, aiOn, onContactChange, onError }: Prop
           </div>
           <ToggleGroup type="single" size="sm" variant="outline" value={filter} onValueChange={(v) => v && setFilter(v as Filter)} className="w-full">
             {FILTERS.map((f) => (
-              <ToggleGroupItem key={f.value} value={f.value} className="flex-1 px-2 text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">
+              <ToggleGroupItem key={f.value} value={f.value} className="flex-auto gap-1 px-2 text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">
                 {f.label}
                 {f.value === 'waiting' && waitingCount > 0 && (
-                  <span className="ml-1 rounded-full bg-amber-500 px-1.5 text-[10px] font-semibold text-white">{waitingCount}</span>
+                  <span className="rounded-full bg-amber-500 px-1.5 text-[10px] font-semibold text-white">{waitingCount}</span>
                 )}
               </ToggleGroupItem>
             ))}
