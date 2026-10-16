@@ -38,12 +38,20 @@ export const env = {
     );
   },
 
+  // Atendente de IA (a chave fica em ANTHROPIC_API_KEY, lida pelo SDK)
+  /** AI_ENABLED=false desliga a IA para todas as conversas. */
+  get aiEnabled() { return process.env.AI_ENABLED !== 'false' && !!process.env.ANTHROPIC_API_KEY; },
+  get aiModel() { return process.env.AI_MODEL || 'claude-opus-5-5'; },
+  /** Espera antes de responder, para juntar mensagens enviadas em sequência pelo cliente. */
+  get aiDebounceMs() { return Number(process.env.AI_DEBOUNCE_SECONDS ?? 8) * 1000; },
+
   // Banco
   get supabaseUrl() { return required('SUPABASE_URL'); },
   get supabaseServiceRoleKey() { return required('SUPABASE_SERVICE_ROLE_KEY'); },
 
   // Painel
   get dashboardPassword() { return required('DASHBOARD_PASSWORD'); },
-  get storeMessageText() { return process.env.STORE_MESSAGE_TEXT === 'true'; },
+  /** Necessário para as conversas no painel e para a IA. STORE_MESSAGE_TEXT=false desliga. */
+  get storeMessageText() { return process.env.STORE_MESSAGE_TEXT !== 'false'; },
   get timezone() { return process.env.TIMEZONE || 'America/Sao_Paulo'; },
 };

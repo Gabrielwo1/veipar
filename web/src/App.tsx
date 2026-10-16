@@ -3,7 +3,8 @@ import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Charts } from '@/components/Charts';
 import { ClientsTable } from '@/components/ClientsTable';
-import { Header } from '@/components/Header';
+import { Conversations } from '@/components/Conversations';
+import { Header, type View } from '@/components/Header';
 import { KpiCards } from '@/components/KpiCards';
 import { Login } from '@/components/Login';
 import { SalesDialog } from '@/components/SalesDialog';
@@ -12,6 +13,8 @@ import { brl, fmtPhone, setTimezone } from '@/lib/format';
 import { computeDashboard, fetchDays, type Period } from '@/lib/metrics';
 
 const PERIOD_KEY = 'vf_period';
+const VIEW_KEY = 'vf_view';
+const readView = (): View => { try { return localStorage.getItem(VIEW_KEY) === 'conversas' ? 'conversas' : 'painel'; } catch { return 'painel'; } };
 const readPeriod = (): Period => {
   try { const v = Number(localStorage.getItem(PERIOD_KEY)); return ([1, 7, 30, 90] as const).find((p) => p === v) ?? 30; } catch { return 30; }
 };
@@ -24,6 +27,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [salesFor, setSalesFor] = useState<string | null>(null);
+  const [view, setView] = useState<View>(readView);
 
   const logout = useCallback((msg?: string) => {
     session.set(''); setAuthed(false); setData(null); setLoginError(msg);
@@ -50,15 +54,20 @@ export default function App() {
 
   useEffect(() => { if (authed) load(); }, [authed, load]);
 
-  // Atualização automática; pausa enquanto alguém digita um valor de venda.
+  // Atualização automática (mais rápida nas conversas); no painel, pausa enquanto alguém digita um valor de venda.
   useEffect(() => {
     if (!authed) return;
     const id = setInterval(() => {
-      const typing = (document.activeElement as HTMLElement | null)?.closest?.('form');
+      const typing = view === 'painel' && (document.activeElement as HTMLElement | null)?.closest?.('form');
       if (!document.hidden && !typing) load();
-    }, 30_000);
+    }, view === 'conversas' ? 8_000 : 30_000);
     return () => clearInterval(id);
-  }, [authed, load]);
+  }, [authed, load, view]);
+
+  const patchContact = useCallback((waId: string, patch: Partial<Contact>) => {
+    setData((d) => d && { ...d, contacts: d.contacts.map((c) => (c.wa_id === waId ? { ...c, ...patch } : c)) });
+  }, []);
+  const waiting = data?.contacts.filter((c) => c.handoff_at).length ?? 0;
 
   const dashboard = useMemo(() => (data ? computeDashboard(data, period, '') : null), [data, period]);
   const salesContact = data?.contacts.find((c) => c.wa_id === salesFor) ?? null;
@@ -100,12 +109,16 @@ export default function App() {
   return (
     <div className="min-h-svh">
       <Header
+        view={view} waiting={waiting}
+        onView={(v) => { setView(v); try { localStorage.setItem(VIEW_KEY, v); } catch { /* sem storage */ } }}
         period={period}
         onPeriod={(p) => { setPeriod(p); try { localStorage.setItem(PERIOD_KEY, String(p)); } catch { /* sem storage */ } }}
         updatedAt={updatedAt} loading={loading} onRefresh={load} onLogout={() => logout()}
       />
       <main className="mx-auto flex max-w-[1400px] flex-col gap-4 px-4 py-6 sm:px-6">
-        {!dashboard ? (
+        {view === 'conversas' && data ? (
+          <Conversations contacts={data.contacts} aiOn={data.ai} onContactChange={patchContact} onError={handleError} />
+        ) : !dashboard ? (
           <div className="grid gap-3">
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-6">
               <Skeleton className="col-span-2 row-span-2 h-[232px] rounded-xl" />

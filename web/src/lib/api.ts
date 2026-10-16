@@ -20,7 +20,30 @@ export interface Contact {
   last_reply_at: string | null;
   ad_source_id: string | null;
   ad_headline: string | null;
+  ai_enabled: boolean;
+  handoff_at: string | null;
+  handoff_summary: HandoffSummary | null;
+  last_preview: string | null;
   sales: Sale[];
+}
+
+/** Pedido coletado pela IA ao passar a conversa para a equipe. */
+export interface HandoffSummary {
+  motivo?: 'pedido_pronto' | 'pediu_humano' | 'fora_do_escopo';
+  itens?: { produto: string; quantidade: string }[];
+  nome_cliente?: string;
+  cidade_uf?: string;
+  perfil?: string;
+  observacoes?: string;
+  resumo?: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  author: 'customer' | 'ai' | 'human';
+  type: string;
+  body: string | null;
+  sent_at: string;
 }
 
 export interface DashboardData {
@@ -28,6 +51,8 @@ export interface DashboardData {
   sales: SaleWithContact[];
   lines: Record<string, string>;
   timezone: string;
+  /** IA configurada no servidor (ANTHROPIC_API_KEY presente e AI_ENABLED != false). */
+  ai: boolean;
 }
 
 const KEY = 'vf_dash_pwd';
@@ -55,4 +80,9 @@ export const api = {
   addSale: (body: { wa_id: string; amount: string; sold_at?: string }) =>
     request<{ sale: Sale }>('/api/sales', { method: 'POST', body: JSON.stringify(body) }),
   deleteSale: (id: number) => request<{ ok: true }>(`/api/sales?id=${id}`, { method: 'DELETE' }),
+  messages: (waId: string) => request<{ messages: ChatMessage[] }>(`/api/messages?wa_id=${waId}`),
+  send: (waId: string, text: string) =>
+    request<{ message: ChatMessage }>('/api/messages', { method: 'POST', body: JSON.stringify({ wa_id: waId, text }) }),
+  setAi: (waId: string, enabled: boolean) =>
+    request<{ ok: true }>('/api/contacts', { method: 'PATCH', body: JSON.stringify({ wa_id: waId, ai_enabled: enabled }) }),
 };

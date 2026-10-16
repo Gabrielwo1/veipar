@@ -3,6 +3,8 @@ import { safeEqual } from '../lib/security.js';
 import { parseWebhook } from '../lib/webhook-parser.js';
 import { registerInbound, registerOutbound } from '../lib/db.js';
 import { notifyManagers } from '../lib/notify.js';
+import { runAttendant } from '../lib/ai/attendant.js';
+import { waitUntil } from '@vercel/functions';
 
 const text = (body: string, status: number) => new Response(body, { status });
 
@@ -32,8 +34,12 @@ export async function POST(request: Request): Promise<Response> {
   try {
     if (event.kind === 'inbound') {
       const result = await registerInbound(event);
-      if (!result.duplicate && result.should_notify) {
+      if (!result.duplicate && result.should_notify && env.managerPhones.length + env.notifyGroupIds.length > 0) {
         await notifyManagers(event, result.is_new);
+      }
+      if (!result.duplicate && env.aiEnabled) {
+        // Responde depois do 200 para a Z-API; a função continua viva até a IA terminar.
+        waitUntil(runAttendant(event.waId, event.messageId).catch((err) => console.error('runAttendant', event.waId, err)));
       }
     } else {
       await registerOutbound(event);

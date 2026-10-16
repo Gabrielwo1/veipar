@@ -1,4 +1,4 @@
-import { LogOut, RefreshCw } from 'lucide-react';
+import { LayoutDashboard, LogOut, MessagesSquare, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -13,7 +13,13 @@ const PERIODS: { value: Period; label: string }[] = [
   { value: 90, label: '90 dias' },
 ];
 
+export type View = 'painel' | 'conversas';
+
 interface Props {
+  view: View;
+  onView: (v: View) => void;
+  /** Conversas aguardando a equipe (badge na aba). */
+  waiting: number;
   period: Period;
   onPeriod: (p: Period) => void;
   updatedAt: Date | null;
@@ -22,7 +28,7 @@ interface Props {
   onLogout: () => void;
 }
 
-export function Header({ period, onPeriod, updatedAt, loading, onRefresh, onLogout }: Props) {
+export function Header({ view, onView, waiting, period, onPeriod, updatedAt, loading, onRefresh, onLogout }: Props) {
   return (
     <header className="sticky top-0 z-30 border-b bg-white/85 backdrop-blur supports-[backdrop-filter]:bg-white/70">
       <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
@@ -38,7 +44,19 @@ export function Header({ period, onPeriod, updatedAt, loading, onRefresh, onLogo
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <ToggleGroup
+            type="single" size="sm" value={view} onValueChange={(v) => v && onView(v as View)}
+            className="rounded-lg bg-muted p-0.5"
+          >
+            <ToggleGroupItem value="painel" className="gap-1.5 rounded-md px-3 data-[state=on]:bg-white data-[state=on]:shadow-sm">
+              <LayoutDashboard className="size-4" />Painel
+            </ToggleGroupItem>
+            <ToggleGroupItem value="conversas" className="gap-1.5 rounded-md px-3 data-[state=on]:bg-white data-[state=on]:shadow-sm">
+              <MessagesSquare className="size-4" />Conversas
+              {waiting > 0 && <span className="rounded-full bg-amber-500 px-1.5 text-[10px] font-semibold text-white">{waiting}</span>}
+            </ToggleGroupItem>
+          </ToggleGroup>
           <ToggleGroup
             type="single" variant="outline" size="sm" value={String(period)}
             onValueChange={(v) => v && onPeriod(Number(v) as Period)}

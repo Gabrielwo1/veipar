@@ -1,5 +1,5 @@
 import { env } from '../lib/env.js';
-import { db } from '../lib/db.js';
+import { db, setAiEnabled } from '../lib/db.js';
 import { authorized, json } from '../lib/http.js';
 
 /** Contatos e vendas do período para o painel. */
@@ -13,7 +13,7 @@ export async function GET(request: Request): Promise<Response> {
     db()
       .from('contacts')
       .select(
-        'wa_id, name, line, first_seen_at, last_message_at, message_count, first_reply_at, last_reply_at, ad_source_id, ad_headline, sales(id, amount, sold_at)',
+        'wa_id, name, line, first_seen_at, last_message_at, message_count, first_reply_at, last_reply_at, ad_source_id, ad_headline, ai_enabled, handoff_at, handoff_summary, last_preview, sales(id, amount, sold_at)',
       )
       .gte('last_message_at', since)
       .order('last_message_at', { ascending: false })
@@ -34,5 +34,20 @@ export async function GET(request: Request): Promise<Response> {
     sales: sales.data,
     lines: env.lineLabels,
     timezone: env.timezone,
+    ai: env.aiEnabled,
   });
+}
+
+/** Liga/desliga a IA numa conversa. Body: { wa_id, ai_enabled } */
+export async function PATCH(request: Request): Promise<Response> {
+  if (!authorized(request)) return json({ error: 'unauthorized' }, 401);
+  const body = await request.json().catch(() => null);
+  const waId = String(body?.wa_id ?? '').replace(/\D/g, '');
+  if (!waId || typeof body?.ai_enabled !== 'boolean') return json({ error: 'Informe wa_id e ai_enabled.' }, 400);
+  try {
+    await setAiEnabled(waId, body.ai_enabled);
+    return json({ ok: true });
+  } catch (err) {
+    return json({ error: err instanceof Error ? err.message : String(err) }, 500);
+  }
 }

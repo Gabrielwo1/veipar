@@ -52,3 +52,72 @@ export async function logNotification(waId: string, recipient: string, ok: boole
     .insert({ wa_id: waId, recipient, ok, error: err ?? null });
   if (error) console.error('logNotification', error.message);
 }
+
+export type Author = 'customer' | 'ai' | 'human';
+
+export interface ChatMessage {
+  id: string;
+  author: Author;
+  type: string;
+  body: string | null;
+  sent_at: string;
+}
+
+export interface ChatState {
+  wa_id: string;
+  name: string | null;
+  ai_enabled: boolean;
+  handoff_at: string | null;
+}
+
+/** Registra uma mensagem que nós enviamos pela API (IA ou painel). */
+export async function registerSent(waId: string, messageId: string, author: Exclude<Author, 'customer'>, body: string) {
+  const { error } = await db().rpc('register_sent', {
+    p_message_id: messageId,
+    p_wa_id: waId,
+    p_author: author,
+    p_body: body,
+    p_sent_at: new Date().toISOString(),
+  });
+  if (error) throw new Error(`register_sent: ${error.message}`);
+}
+
+export async function getChatState(waId: string): Promise<ChatState | null> {
+  const { data, error } = await db()
+    .from('contacts')
+    .select('wa_id, name, ai_enabled, handoff_at')
+    .eq('wa_id', waId)
+    .maybeSingle();
+  if (error) throw new Error(`getChatState: ${error.message}`);
+  return data;
+}
+
+/** Últimas `limit` mensagens da conversa, da mais antiga para a mais recente. */
+export async function getMessages(waId: string, limit = 60): Promise<ChatMessage[]> {
+  const { data, error } = await db()
+    .from('messages')
+    .select('id, author, type, body, sent_at')
+    .eq('wa_id', waId)
+    .order('sent_at', { ascending: false })
+    .limit(limit);
+  if (error) throw new Error(`getMessages: ${error.message}`);
+  return (data as ChatMessage[]).reverse();
+}
+
+/** Liga/desliga a IA na conversa. Nos dois casos a conversa deixa de estar "aguardando a equipe". */
+export async function setAiEnabled(waId: string, enabled: boolean) {
+  const { error } = await db()
+    .from('contacts')
+    .update({ ai_enabled: enabled, handoff_at: null })
+    .eq('wa_id', waId);
+  if (error) throw new Error(`setAiEnabled: ${error.message}`);
+}
+
+/** A IA concluiu a coleta do pedido: grava o resumo e passa a conversa para a equipe. */
+export async function handoff(waId: string, summary: Record<string, unknown>) {
+  const { error } = await db()
+    .from('contacts')
+    .update({ ai_enabled: false, handoff_at: new Date().toISOString(), handoff_summary: summary })
+    .eq('wa_id', waId);
+  if (error) throw new Error(`handoff: ${error.message}`);
+}
