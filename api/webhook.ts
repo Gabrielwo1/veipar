@@ -5,6 +5,7 @@ import { registerInbound, registerOutbound } from '../lib/db.js';
 import { notifyManagers } from '../lib/notify.js';
 import { runAttendant } from '../lib/ai/attendant.js';
 import { waitUntil } from '@vercel/functions';
+import { transcribeAudio } from '../lib/ai/transcribe.js';
 
 const text = (body: string, status: number) => new Response(body, { status });
 
@@ -33,7 +34,13 @@ export async function POST(request: Request): Promise<Response> {
 
   try {
     if (event.kind === 'inbound') {
-      console.log(JSON.stringify({ inbound: event.waId.slice(-4), zapi_delay_ms: Date.now() - event.sentAt.getTime() }));
+      console.log(JSON.stringify({ inbound: event.waId.slice(-4), type: event.type, zapi_delay_ms: Date.now() - event.sentAt.getTime() }));
+      if (event.type === 'audio' && event.media && !event.text) {
+        // Áudio do cliente vira texto: aparece no painel e a IA entende.
+        const t = Date.now();
+        event.text = await transcribeAudio(event.media.url, event.media.mimeType);
+        console.log(JSON.stringify({ transcribe_ms: Date.now() - t, ok: !!event.text }));
+      }
       const result = await registerInbound(event);
       if (!result.duplicate && result.should_notify && env.managerPhones.length + env.notifyGroupIds.length > 0) {
         await notifyManagers(event, result.is_new);

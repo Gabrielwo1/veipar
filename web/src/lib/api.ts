@@ -47,6 +47,8 @@ export interface ChatMessage {
   type: string;
   body: string | null;
   sent_at: string;
+  /** Link do áudio/imagem/vídeo/documento (Z-API). Em áudio do cliente, body é a transcrição. */
+  media_url?: string | null;
 }
 
 export interface DashboardData {

@@ -6,7 +6,7 @@ process.env.LINE_LABELS = '554632200000:Loja Centro';
 
 const event: InboundEvent = {
   kind: 'inbound', messageId: 'A', waId: '5546999990000', name: 'Maria', line: '554632200000',
-  instanceId: 'I', type: 'text', text: 'meu pedido de ...', sentAt: new Date('2026-10-15T17:32:00Z'), replyTo: null,
+  instanceId: 'I', type: 'text', text: 'meu pedido de ...', sentAt: new Date('2026-10-15T17:32:00Z'), replyTo: null, media: null,
   ad: { sourceId: '1', headline: 'Peça seu orçamento' },
 };
 

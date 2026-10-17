@@ -12,10 +12,17 @@ export interface InboundEvent {
   type: string;
   text: string | null;
   sentAt: Date;
+  /** Link do arquivo (áudio, imagem, vídeo, documento) hospedado pela Z-API. */
+  media: Media | null;
   /** messageId da mensagem citada, quando o cliente usa "responder" no WhatsApp. */
   replyTo: string | null;
   /** Preenchido quando a conversa veio de um anúncio Click-to-WhatsApp. */
   ad: { sourceId: string; headline: string | null } | null;
+}
+
+export interface Media {
+  url: string;
+  mimeType: string | null;
 }
 
 export interface OutboundEvent {
@@ -27,6 +34,7 @@ export interface OutboundEvent {
   type: string;
   text: string | null;
   sentAt: Date;
+  media: Media | null;
 }
 
 export type WebhookEvent = InboundEvent | OutboundEvent;
@@ -52,6 +60,16 @@ function textOf(p: any): string | null {
   );
 }
 
+function mediaOf(p: any): Media | null {
+  const m =
+    (p.audio && { url: p.audio.audioUrl, mimeType: p.audio.mimeType }) ||
+    (p.image && { url: p.image.imageUrl, mimeType: p.image.mimeType }) ||
+    (p.video && { url: p.video.videoUrl, mimeType: p.video.mimeType }) ||
+    (p.document && { url: p.document.documentUrl, mimeType: p.document.mimeType }) ||
+    (p.sticker && { url: p.sticker.stickerUrl, mimeType: p.sticker.mimeType });
+  return m?.url ? { url: String(m.url), mimeType: m.mimeType ? String(m.mimeType) : null } : null;
+}
+
 /** Retorna null para tudo que não é conversa individual com cliente (grupos, canais, status, listas). */
 export function parseWebhook(p: any): WebhookEvent | null {
   if (p?.type !== 'ReceivedCallback') return null;
@@ -72,6 +90,7 @@ export function parseWebhook(p: any): WebhookEvent | null {
     type,
     text: textOf(p),
     sentAt: new Date(Number(p.momment)),
+    media: mediaOf(p),
   };
 
   if (p.fromMe) {

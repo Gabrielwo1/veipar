@@ -32,10 +32,7 @@ export async function registerInbound(e: InboundEvent): Promise<InboundResult> {
   });
   if (error) throw new Error(`register_inbound: ${error.message}`);
   const result = (data as InboundResult[])[0];
-  if (e.replyTo && !result.duplicate) {
-    const { error: replyErr } = await db().from('messages').update({ reply_to: e.replyTo }).eq('id', e.messageId);
-    if (replyErr) console.error('reply_to', replyErr.message);
-  }
+  if (!result.duplicate && (e.replyTo || e.media)) await setMessageExtras(e.messageId, { reply_to: e.replyTo, media_url: e.media?.url ?? null });
   return result;
 }
 
@@ -49,6 +46,13 @@ export async function registerOutbound(e: OutboundEvent): Promise<void> {
     p_sent_at: e.sentAt.toISOString(),
   });
   if (error) throw new Error(`register_outbound: ${error.message}`);
+  if (e.media) await setMessageExtras(e.messageId, { media_url: e.media.url });
+}
+
+/** Campos que as funções register_* não recebem: mensagem citada e link da mídia. */
+async function setMessageExtras(id: string, extras: { reply_to?: string | null; media_url?: string | null }) {
+  const { error } = await db().from('messages').update(extras).eq('id', id);
+  if (error) console.error('setMessageExtras', id, error.message);
 }
 
 export async function logNotification(waId: string, recipient: string, ok: boolean, err?: string) {
@@ -67,6 +71,7 @@ export interface ChatMessage {
   body: string | null;
   sent_at: string;
   reply_to?: string | null;
+  media_url?: string | null;
 }
 
 export interface ChatState {
@@ -105,7 +110,7 @@ export async function getChatState(waId: string): Promise<ChatState | null> {
 export async function getMessages(waId: string, limit = 60): Promise<ChatMessage[]> {
   const { data, error } = await db()
     .from('messages')
-    .select('id, author, type, body, sent_at, reply_to')
+    .select('id, author, type, body, sent_at, reply_to, media_url')
     .eq('wa_id', waId)
     .order('created_at', { ascending: false })
     .order('id', { ascending: false })

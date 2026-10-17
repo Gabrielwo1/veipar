@@ -26,6 +26,14 @@ const received = {
 };
 
 describe('parseWebhook (Z-API)', () => {
+  it('extrai o link do áudio', () => {
+    const { text, externalAdReply, ...base } = received;
+    const e = parseWebhook({ ...base, messageId: 'AUD1', audio: { audioUrl: 'https://z/a.ogg', mimeType: 'audio/ogg; codecs=opus', ptt: true } }) as InboundEvent;
+    expect(e.type).toBe('audio');
+    expect(e.media).toEqual({ url: 'https://z/a.ogg', mimeType: 'audio/ogg; codecs=opus' });
+    expect(e.text).toBeNull();
+  });
+
   it('guarda a mensagem citada (responder)', () => {
     const e = parseWebhook({ ...received, referenceMessageId: 'Q1' }) as InboundEvent;
     expect(e.replyTo).toBe('Q1');

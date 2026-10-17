@@ -31,6 +31,32 @@ const MEDIA: Record<string, string> = {
   sticker: 'Figurinha', location: '📍 Localização', contact: '👤 Contato',
 };
 
+/** Conteúdo do balão: texto, ou mídia (áudio com player e transcrição, imagem, vídeo, documento). */
+function MessageBody({ m }: { m: ChatMessage }) {
+  const url = m.media_url;
+  if (m.type === 'audio') {
+    return (
+      <div className="space-y-1">
+        {url ? <audio controls preload="none" src={url} className="h-9 w-64 max-w-full" /> : <span className="italic opacity-70">{MEDIA.audio}</span>}
+        {m.body && <p className="text-[13px] italic opacity-80">“{m.body}”</p>}
+      </div>
+    );
+  }
+  if (m.type === 'image' && url) {
+    return (
+      <div className="space-y-1">
+        <a href={url} target="_blank" rel="noopener noreferrer"><img src={url} alt="Imagem enviada" loading="lazy" className="max-h-64 rounded-lg" /></a>
+        {m.body && <p>{m.body}</p>}
+      </div>
+    );
+  }
+  if (m.type === 'video' && url) return <video controls preload="none" src={url} className="max-h-64 rounded-lg" />;
+  if (url && (m.type === 'document' || m.type === 'sticker')) {
+    return <a href={url} target="_blank" rel="noopener noreferrer" className="underline">{MEDIA[m.type]}{m.body ? ` · ${m.body}` : ''}</a>;
+  }
+  return <>{m.body ?? <span className="italic opacity-70">{MEDIA[m.type] ?? 'Mensagem sem texto'}</span>}</>;
+}
+
 /** Encaminhada pela IA e ninguém da equipe respondeu ou assumiu ainda (o servidor limpa handoff_at quando isso acontece). */
 const isWaiting = (c: Contact) => !!c.handoff_at;
 
@@ -252,7 +278,7 @@ function Thread({ contact, aiOn, onBack, onContactChange, onError }: {
                       {m.author === 'ai' ? <><Bot className="size-3" />IA</> : <><UserRound className="size-3" />Equipe</>}
                     </div>
                   )}
-                  {m.body ?? <span className="italic opacity-70">{MEDIA[m.type] ?? 'Mensagem sem texto'}</span>}
+                  <MessageBody m={m} />
                   <div className={cn('mt-0.5 text-right text-[10px] tabular', m.author === 'human' ? 'text-primary-foreground/60' : 'text-muted-foreground')}>{fmtTime(m.sent_at)}</div>
                 </div>
               </div>

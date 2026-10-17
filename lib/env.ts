@@ -42,6 +42,8 @@ export const env = {
   /** AI_ENABLED=false desliga a IA para todas as conversas. */
   get aiEnabled() { return process.env.AI_ENABLED !== 'false' && !!process.env.OPENAI_API_KEY; },
   get aiModel() { return process.env.AI_MODEL || 'gpt-5.5'; },
+  /** Modelo de transcrição dos áudios do cliente. */
+  get transcribeModel() { return process.env.TRANSCRIBE_MODEL || 'gpt-4o-transcribe'; },
   /** Espera antes de responder, para juntar mensagens enviadas em sequência pelo cliente. */
   get aiDebounceMs() { return Number(process.env.AI_DEBOUNCE_SECONDS ?? 3) * 1000; },
 

@@ -52,6 +52,7 @@ const MEDIA_LABEL: Record<string, string> = {
 
 function render(m: ChatMessage): string {
   if (m.body && m.type === 'text') return m.body;
+  if (m.body && m.type === 'audio') return `[áudio do cliente, transcrito] ${m.body}`;
   const what = MEDIA_LABEL[m.type] ?? 'uma mensagem que não é texto';
   return m.body ? `[cliente enviou ${what} com a legenda: ${m.body}]` : `[cliente enviou ${what}]`;
 }
