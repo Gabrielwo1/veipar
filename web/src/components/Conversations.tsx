@@ -31,6 +31,15 @@ const MEDIA: Record<string, string> = {
   sticker: 'Figurinha', location: '📍 Localização', contact: '👤 Contato',
 };
 
+/** Formatação do WhatsApp no painel: *negrito* e _itálico_. */
+function WaText({ text }: { text: string }) {
+  const parts = text.split(/(\*[^*\n]+\*|_[^_\n]+_)/g);
+  return <>{parts.map((p, i) =>
+    p.length > 2 && p.startsWith('*') && p.endsWith('*') ? <b key={i}>{p.slice(1, -1)}</b>
+      : p.length > 2 && p.startsWith('_') && p.endsWith('_') ? <i key={i}>{p.slice(1, -1)}</i>
+        : p)}</>;
+}
+
 /** Conteúdo do balão: texto, ou mídia (áudio com player e transcrição, imagem, vídeo, documento). */
 function MessageBody({ m }: { m: ChatMessage }) {
   const url = m.media_url;
@@ -46,7 +55,7 @@ function MessageBody({ m }: { m: ChatMessage }) {
     return (
       <div className="space-y-1">
         <a href={url} target="_blank" rel="noopener noreferrer"><img src={url} alt="Imagem enviada" loading="lazy" className="max-h-64 rounded-lg" /></a>
-        {m.body && <p>{m.body}</p>}
+        {m.body && <p><WaText text={m.body} /></p>}
       </div>
     );
   }
@@ -54,7 +63,7 @@ function MessageBody({ m }: { m: ChatMessage }) {
   if (url && (m.type === 'document' || m.type === 'sticker')) {
     return <a href={url} target="_blank" rel="noopener noreferrer" className="underline">{MEDIA[m.type]}{m.body ? ` · ${m.body}` : ''}</a>;
   }
-  return <>{m.body ?? <span className="italic opacity-70">{MEDIA[m.type] ?? 'Mensagem sem texto'}</span>}</>;
+  return m.body ? <WaText text={m.body} /> : <span className="italic opacity-70">{MEDIA[m.type] ?? 'Mensagem sem texto'}</span>;
 }
 
 /** Encaminhada pela IA e ninguém da equipe respondeu ou assumiu ainda (o servidor limpa handoff_at quando isso acontece). */

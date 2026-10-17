@@ -136,6 +136,7 @@ Observações:
 - **Retirada no local:** o site tem o recurso, mas não confirma a disponibilidade **(confirmar)**.
 - **Pagamento (ícones no rodapé):** Visa, Mastercard, American Express, Elo e Hipercard. **Pix, boleto e parcelamento não aparecem no site (confirmar)**.
 - **Pedido mínimo:** o menor pacote vendido é o de 100 peças. Não há pedido mínimo declarado.
+- **Preço especial por volume (confirmado pela Veipar em 16/10/2026):** a partir de **1.000 unidades**, a Veipar pode fazer **preço especial**, negociado direto com o vendedor. Os valores não são tabelados: quem passa é o vendedor.
 - **Atacado/revenda:** o site cita revendedores como público e tem pacotes de até 2500 peças. Tabela de atacado e condições para revendedor não publicadas **(confirmar)**.
 - **Trocas e devoluções (Política de reembolso):**
   - O cliente pode pedir devolução em até **30 dias após o recebimento**, com o item sem uso, na embalagem original e com o comprovante de compra.

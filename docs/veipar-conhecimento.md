@@ -134,6 +134,7 @@ Observações:
 - **Retirada no local:** o site tem o recurso, mas não confirma a disponibilidade **(confirmar)**.
 - **Pagamento (ícones no rodapé):** Visa, Mastercard, American Express, Elo e Hipercard. **Pix, boleto e parcelamento não aparecem no site (confirmar)**.
 - **Pedido mínimo:** o menor pacote vendido é o de 100 peças. Não há pedido mínimo declarado.
+- **Preço especial por volume (confirmado pela Veipar em 16/10/2026):** a partir de **1.000 unidades**, a Veipar pode fazer **preço especial**, negociado direto com o vendedor. Os valores não são tabelados: quem passa é o vendedor.
 - **Atacado/revenda:** o site cita revendedores como público e tem pacotes de até 2500 peças. Tabela de atacado e condições para revendedor não publicadas **(confirmar)**.
 - **Trocas e devoluções (Política de reembolso):**
   - O cliente pode pedir devolução em até **30 dias após o recebimento**, com o item sem uso, na embalagem original e com o comprovante de compra.
@@ -171,7 +172,7 @@ O site não tem página de FAQ (`/pages/faq` não existe). As respostas abaixo f
 7. Marca, volume e rendimento do "PU 40" (quantas peças por tubo); cor do PU no kit de 1000; quantos bicos vêm no produto "Bico injetor" e como encaixa na bisnaga.
 8. Instruções complementares: preparo da superfície, cura, clima, uso em parafuso enferrujado ou vazando, erros comuns.
 9. Garantia do produto (anos), se houver.
-10. Preços de atacado/revenda, faixas de desconto por quantidade e pedido mínimo para revenda.
+10. Faixas de desconto acima de 1.000 unidades (o preço especial existe, mas é negociado pelo vendedor) e pedido mínimo para revenda.
 11. Prazos de envio e entrega, transportadoras, frete grátis e retirada em Francisco Beltrão.
 12. Pagamento: Pix (com desconto?), boleto, parcelamento (quantas vezes, com ou sem juros), pagamento pelo WhatsApp.
 13. Endereço de devolução (está como texto de modelo na política).
