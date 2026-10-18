@@ -130,15 +130,24 @@ async function ask(input: ResponseInputItem[], context: string): Promise<AIRespo
  * Gera a resposta da IA para a conversa. Se ela decidir encaminhar, devolve também o resumo do pedido
  * e garante uma mensagem de transição para o cliente.
  */
-export async function generateReply(turns: Turn[], context: string): Promise<{ replies: string[]; summary: Record<string, unknown> | null }> {
+export interface Usage { input: number; cached: number; output: number }
+
+export async function generateReply(turns: Turn[], context: string): Promise<{ replies: string[]; summary: Record<string, unknown> | null; usage: Usage }> {
   const input: ResponseInputItem[] = turns;
-  const response = await ask(input, context);
+  const usage: Usage = { input: 0, cached: 0, output: 0 };
+  const track = (r: AIResponse) => {
+    usage.input += r.usage?.input_tokens ?? 0;
+    usage.cached += r.usage?.input_tokens_details?.cached_tokens ?? 0;
+    usage.output += r.usage?.output_tokens ?? 0;
+    return r;
+  };
+  const response = track(await ask(input, context));
   const replies: string[] = [];
   const first = textOf(response);
   if (first) replies.push(first);
 
   const call = response.output.find((o): o is ResponseFunctionToolCall => o.type === 'function_call');
-  if (!call) return { replies, summary: null };
+  if (!call) return { replies, summary: null, usage };
 
   let summary: Record<string, unknown>;
   try {
@@ -148,17 +157,17 @@ export async function generateReply(turns: Turn[], context: string): Promise<{ r
   }
   if (!first) {
     // A IA chamou a ferramenta sem escrever nada: pede a mensagem de transição para o cliente.
-    const after = textOf(await ask([
+    const after = textOf(track(await ask([
       ...input,
       ...(response.output as ResponseInputItem[]),
       {
         type: 'function_call_output', call_id: call.call_id,
         output: 'Encaminhado. Escreva agora a mensagem curta avisando o cliente que um vendedor vai continuar o atendimento por aqui.',
       },
-    ], context));
+    ], context)));
     if (after) replies.push(after);
   }
-  return { replies, summary };
+  return { replies, summary, usage };
 }
 
 /** Mensagem fixa quando a IA está indisponível: o cliente não fica sem resposta. */
@@ -211,7 +220,7 @@ export async function runAttendant(waId: string, messageId: string): Promise<voi
     await fallbackToTeam(waId, err);
     return;
   }
-  const { replies, summary } = reply;
+  const { replies, summary, usage } = reply;
   const tAi = Date.now();
   if (summary) await handoff(waId, summary);
 
@@ -231,5 +240,6 @@ export async function runAttendant(waId: string, messageId: string): Promise<voi
   console.log(JSON.stringify({
     ai: waId.slice(-4), debounce_ms: env.aiDebounceMs, db_ms: tDb - t0 - env.aiDebounceMs,
     model_ms: tAi - tDb, send_ms: Date.now() - tAi, total_ms: Date.now() - t0, bubbles: bubbles.length, handoff: !!summary,
+    model: env.aiModel, tokens_in: usage.input, tokens_cached: usage.cached, tokens_out: usage.output,
   }));
 }
