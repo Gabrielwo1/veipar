@@ -161,6 +161,24 @@ export async function generateReply(turns: Turn[], context: string): Promise<{ r
   return { replies, summary };
 }
 
+/** Mensagem fixa quando a IA está indisponível: o cliente não fica sem resposta. */
+export const FALLBACK_MESSAGE = 'Oi! Recebi sua mensagem 😊 Um vendedor da Veipar já vai te responder por aqui.';
+
+/**
+ * A IA falhou (sem créditos, fora do ar, erro de rede...): avisa o cliente com uma mensagem fixa
+ * e passa a conversa para a equipe, que vê o motivo no resumo (aba Conversas → Aguardando).
+ */
+async function fallbackToTeam(waId: string, err: unknown) {
+  const reason = err instanceof Error ? err.message : String(err);
+  console.error('IA indisponível, passando para a equipe', waId, reason);
+  await handoff(waId, {
+    motivo: 'fora_do_escopo', itens: [], nome_cliente: '', cidade_uf: '', perfil: '', observacoes: reason.slice(0, 300),
+    resumo: 'A IA ficou indisponível e não respondeu este cliente. Responda por aqui.',
+  });
+  const id = await sendText(waId, FALLBACK_MESSAGE, 1);
+  await registerSent(waId, id, 'ai', FALLBACK_MESSAGE);
+}
+
 /**
  * Responde o cliente com a atendente de IA. Chamado pelo webhook depois de gravar a mensagem `messageId`.
  * Espera alguns segundos para juntar mensagens em sequência; só a execução da última mensagem responde.
@@ -186,7 +204,14 @@ export async function runAttendant(waId: string, messageId: string): Promise<voi
   const tDb = Date.now();
 
   const context = `Agora: ${new Date().toLocaleString('pt-BR', { timeZone: env.timezone })}. Nome no perfil do WhatsApp: ${state.name || 'não informado'}.`;
-  const { replies, summary } = await generateReply(turns, context);
+  let reply: Awaited<ReturnType<typeof generateReply>>;
+  try {
+    reply = await generateReply(turns, context);
+  } catch (err) {
+    await fallbackToTeam(waId, err);
+    return;
+  }
+  const { replies, summary } = reply;
   const tAi = Date.now();
   if (summary) await handoff(waId, summary);
 
