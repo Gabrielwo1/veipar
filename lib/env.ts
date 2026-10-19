@@ -41,7 +41,7 @@ export const env = {
   // Atendente de IA (OpenAI; a chave fica em OPENAI_API_KEY, lida pelo SDK)
   /** AI_ENABLED=false desliga a IA para todas as conversas. */
   get aiEnabled() { return process.env.AI_ENABLED !== 'false' && !!process.env.OPENAI_API_KEY; },
-  get aiModel() { return process.env.AI_MODEL || 'gpt-5.5'; },
+  get aiModel() { return process.env.AI_MODEL || 'gpt-6.1-sol'; },
   /** Modelo de transcrição dos áudios do cliente. */
   get transcribeModel() { return process.env.TRANSCRIBE_MODEL || 'gpt-4o-transcribe'; },
   /** Espera antes de responder, para juntar mensagens enviadas em sequência pelo cliente. */
