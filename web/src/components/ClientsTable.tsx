@@ -11,6 +11,7 @@ import type { Contact } from '@/lib/api';
 import { brl, dayKey, fmtDate, fmtPhone, fmtTime, int, plural } from '@/lib/format';
 import { hasPhone, isManual, isWaiting, replyMs, totalOf } from '@/lib/metrics';
 import { cn } from '@/lib/utils';
+import { StageBadge } from './Stage';
 
 type SortKey = 'last' | 'name' | 'total';
 type Status = 'all' | 'wait' | 'sold' | 'nosale' | 'ad';
@@ -197,7 +198,12 @@ export function ClientsTable({ contacts, lines, onAdd, onOpenSales, onOpenChat, 
                     </Tooltip>
                   ) : <span className="text-sm text-muted-foreground">Orgânico</span>}
                 </TableCell>
-                <TableCell><StatusBadge c={c} /></TableCell>
+                <TableCell>
+                  <div className="flex flex-col items-start gap-1">
+                    <StageBadge stage={c.stage} />
+                    {isWaiting(c) && <StatusBadge c={c} />}
+                  </div>
+                </TableCell>
                 <TableCell className="text-right">
                   <button type="button" onClick={() => onOpenSales(c)} className="group/total inline-flex flex-col items-end rounded-md px-2 py-1 hover:bg-muted">
                     <span className={cn('font-semibold tabular', !total && 'font-normal text-muted-foreground')}>{total ? brl(total) : '—'}</span>

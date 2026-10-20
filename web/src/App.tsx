@@ -90,9 +90,10 @@ export default function App() {
       const { sale } = await api.addSale({ wa_id: c.wa_id, amount, ...(date ? { sold_at: `${date}T12:00:00-03:00` } : {}) });
       setData((d) => d && {
         ...d,
-        contacts: d.contacts.map((x) => (x.wa_id === c.wa_id ? { ...x, sales: [...(x.sales ?? []), sale] } : x)),
+        contacts: d.contacts.map((x) => (x.wa_id === c.wa_id ? { ...x, stage: 'faturado' as const, sales: [...(x.sales ?? []), sale] } : x)),
         sales: [{ ...sale, contacts: { name: c.name, ad_source_id: c.ad_source_id } }, ...d.sales],
       });
+      setChats((list) => list && list.map((x) => (x.wa_id === c.wa_id ? { ...x, stage: 'faturado' } : x)));
       toast.success(`Venda de ${brl(Number(sale.amount))} lançada`, { description: c.name || fmtPhone(c.wa_id) });
       return true;
     } catch (e) {

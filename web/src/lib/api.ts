@@ -15,6 +15,8 @@ export interface Contact {
   name: string | null;
   /** 'manual' = cliente cadastrado à mão (venda fora do WhatsApp). wa_id "m…" quando sem telefone. */
   source: 'whatsapp' | 'manual';
+  /** Etapa: esperando contato → pedido realizado → faturamento realizado (venda lançada). */
+  stage: Stage;
   line: string | null;
   first_seen_at: string;
   last_message_at: string;
@@ -29,6 +31,8 @@ export interface Contact {
   last_preview: string | null;
   sales: Sale[];
 }
+
+export type Stage = 'esperando' | 'pedido' | 'faturado';
 
 /** Pedido coletado pela IA ao passar a conversa para a equipe. */
 export interface HandoffSummary {
@@ -91,6 +95,8 @@ export const api = {
   messages: (waId: string) => request<{ messages: ChatMessage[] }>(`/api/messages?wa_id=${waId}`),
   send: (waId: string, text: string) =>
     request<{ message: ChatMessage }>('/api/messages', { method: 'POST', body: JSON.stringify({ wa_id: waId, text }) }),
+  setStage: (waId: string, stage: Stage) =>
+    request<{ ok: true }>('/api/contacts', { method: 'PATCH', body: JSON.stringify({ wa_id: waId, stage }) }),
   setAi: (waId: string, enabled: boolean) =>
     request<{ ok: true }>('/api/contacts', { method: 'PATCH', body: JSON.stringify({ wa_id: waId, ai_enabled: enabled }) }),
 };

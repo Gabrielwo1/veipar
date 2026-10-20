@@ -159,3 +159,12 @@ export async function isPreExistingChat(waId: string): Promise<boolean> {
   if (error) throw new Error(`isPreExistingChat: ${error.message}`);
   return !!data;
 }
+
+export const STAGES = ['esperando', 'pedido', 'faturado'] as const;
+export type Stage = (typeof STAGES)[number];
+
+/** Etapa da conversa (tag no painel). Lançar venda já marca "faturado" pelo banco. */
+export async function setStage(waId: string, stage: Stage) {
+  const { error } = await db().from('contacts').update({ stage }).eq('wa_id', waId);
+  if (error) throw new Error(`setStage: ${error.message}`);
+}

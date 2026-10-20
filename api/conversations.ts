@@ -14,7 +14,7 @@ export async function GET(request: Request): Promise<Response> {
   const { data, error } = await db()
     .from('contacts')
     .select(
-      'wa_id, name, source, line, first_seen_at, last_message_at, message_count, first_reply_at, last_reply_at, ad_source_id, ad_headline, ai_enabled, handoff_at, handoff_summary, last_preview, sales(id, amount, sold_at, note)',
+      'wa_id, name, source, stage, line, first_seen_at, last_message_at, message_count, first_reply_at, last_reply_at, ad_source_id, ad_headline, ai_enabled, handoff_at, handoff_summary, last_preview, sales(id, amount, sold_at, note)',
     )
     .or(`last_message_at.gte.${since},last_reply_at.gte.${since}`)
     .order('last_message_at', { ascending: false })

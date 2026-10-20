@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { api, type ChatMessage, type Contact } from '@/lib/api';
+import { api, type ChatMessage, type Contact, type Stage } from '@/lib/api';
+import { StageBadge, StageSelect } from './Stage';
 import { dayKey, fmtDate, fmtPhone, fmtTime } from '@/lib/format';
 import { lastActivity } from '@/lib/metrics';
 import { cn } from '@/lib/utils';
@@ -148,7 +149,10 @@ export function Conversations({ contacts, aiOn, selected, onSelect: setSelected,
                       </span>
                     </div>
                     <div className="truncate text-sm text-muted-foreground">{c.last_preview ?? '—'}</div>
-                    <Badge variant="outline" className={cn('mt-1.5 h-5 px-1.5 text-[10px]', st.className)}>{st.label}</Badge>
+                    <div className="mt-1.5 flex flex-wrap gap-1">
+                      <StageBadge stage={c.stage} className="h-5 px-1.5 text-[10px]" />
+                      <Badge variant="outline" className={cn('h-5 px-1.5 text-[10px]', st.className)}>{st.label}</Badge>
+                    </div>
                   </div>
                 </button>
               </li>
@@ -216,6 +220,17 @@ function Thread({ contact, aiOn, onBack, onContactChange, onError }: {
 
   const aiActive = contact.ai_enabled && !contact.handoff_at;
 
+  async function changeStage(stage: Stage) {
+    const before = contact.stage;
+    onContactChange(waId, { stage });
+    try {
+      await api.setStage(waId, stage);
+    } catch (e) {
+      onContactChange(waId, { stage: before });
+      onError(e, 'Não foi possível mudar a etapa');
+    }
+  }
+
   async function toggleAi() {
     const enable = !aiActive && !contact.handoff_at;
     try {
@@ -235,7 +250,10 @@ function Thread({ contact, aiOn, onBack, onContactChange, onError }: {
       <header className="flex items-center gap-3 border-b px-4 py-3">
         <Button variant="ghost" size="icon-sm" className="md:hidden" onClick={onBack} aria-label="Voltar"><ArrowLeft /></Button>
         <div className="min-w-0 flex-1">
-          <div className="truncate font-semibold">{contact.name || fmtPhone(waId)}</div>
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span className="truncate font-semibold">{contact.name || fmtPhone(waId)}</span>
+            <StageSelect stage={contact.stage} onChange={changeStage} />
+          </div>
           <div className="text-xs text-muted-foreground tabular">{fmtPhone(waId)}</div>
         </div>
         <Badge variant="outline" className={cn('hidden sm:inline-flex', st.className)}>{st.label}</Badge>
