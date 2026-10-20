@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Area, AreaChart } from 'recharts';
-import { ArrowDownRight, ArrowUpRight, Clock, Megaphone, MessageCircle, Receipt, ShoppingBag, Target, Timer, Users } from 'lucide-react';
+import { ArrowDownRight, ArrowUpRight, Clock, HandCoins, Megaphone, MessageCircle, Receipt, ShoppingBag, Target, Timer, Users } from 'lucide-react';
+import { brand } from '@/brand';
 import { Card } from '@/components/ui/card';
 import { ChartContainer } from '@/components/ui/chart';
 import { cn } from '@/lib/utils';
@@ -50,9 +51,12 @@ export function KpiCards({ d, period }: { d: Dashboard; period: Period }) {
   const ticket = cur.salesCount ? cur.revenue / cur.salesCount : 0;
   const prevTicket = prev.salesCount ? prev.revenue / prev.salesCount : 0;
   const conv = d.contacts.length ? cur.buyers / d.contacts.length : null;
+  const { label: profitLabel, rate } = brand.profit;
+  const pct = `${(rate * 100).toLocaleString('pt-BR', { maximumFractionDigits: 2 })}%`;
+  const profitLine = d.timeline.map((t) => ({ lucro: t.receita * rate }));
 
   return (
-    <section className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-6">
+    <section className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-8">
       {/* Destaque: faturamento */}
       <Card className="relative col-span-2 row-span-2 gap-0 overflow-hidden border-0 bg-primary p-5 text-primary-foreground shadow-lg shadow-black/10">
         <div className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-brand/25 blur-3xl" />
@@ -76,6 +80,33 @@ export function KpiCards({ d, period }: { d: Dashboard; period: Period }) {
               </linearGradient>
             </defs>
             <Area dataKey="receita" type="monotone" stroke="var(--brand)" strokeWidth={2} fill="url(#heroFill)" isAnimationActive={false} />
+          </AreaChart>
+        </ChartContainer>
+      </Card>
+
+      {/* Destaque: nosso lucro (% do faturamento) */}
+      <Card className="relative col-span-2 row-span-2 gap-0 overflow-hidden border-0 bg-gradient-to-br from-brand-deep to-[#06527f] p-5 text-white shadow-lg shadow-brand/20">
+        <div className="pointer-events-none absolute -bottom-20 -left-10 size-56 rounded-full bg-white/10 blur-3xl" />
+        <div className="relative flex items-center justify-between">
+          <span className="text-sm font-medium text-white/80">{profitLabel}</span>
+          <span className="grid size-8 place-items-center rounded-lg bg-white/15"><HandCoins className="size-4" /></span>
+        </div>
+        <div className="relative mt-3 flex flex-wrap items-baseline gap-3">
+          <span className="text-4xl font-semibold tracking-tight tabular">{brl(cur.revenue * rate)}</span>
+          <Delta value={delta(cur.revenue, prev.revenue)} dark />
+        </div>
+        <div className="relative mt-1 text-sm text-white/75">
+          {pct} do faturamento de {brl(cur.revenue)} · vs. {PREV_LABEL[period]}
+        </div>
+        <ChartContainer config={{ lucro: { label: profitLabel, color: '#ffffff' } }} className="relative -mx-5 -mb-5 mt-auto h-24 w-[calc(100%+2.5rem)] pt-4">
+          <AreaChart data={profitLine} margin={{ top: 4, right: 0, bottom: 0, left: 0 }}>
+            <defs>
+              <linearGradient id="profitFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#ffffff" stopOpacity={0.45} />
+                <stop offset="100%" stopColor="#ffffff" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <Area dataKey="lucro" type="monotone" stroke="#ffffff" strokeWidth={2} fill="url(#profitFill)" isAnimationActive={false} />
           </AreaChart>
         </ChartContainer>
       </Card>

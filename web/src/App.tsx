@@ -153,7 +153,8 @@ export default function App() {
           />
         ) : !dashboard ? (
           <div className="grid gap-3">
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-6">
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-8">
+              <Skeleton className="col-span-2 row-span-2 h-[232px] rounded-xl" />
               <Skeleton className="col-span-2 row-span-2 h-[232px] rounded-xl" />
               {Array.from({ length: 8 }, (_, i) => <Skeleton key={i} className="h-28 rounded-xl" />)}
             </div>
