@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
+import { BrazilMap } from '@/components/BrazilMap';
 import { Charts } from '@/components/Charts';
 import { ClientsTable } from '@/components/ClientsTable';
 import { Conversations } from '@/components/Conversations';
@@ -15,6 +16,7 @@ import { computeDashboard, fetchDays, type Period } from '@/lib/metrics';
 
 const PERIOD_KEY = 'vf_period';
 const VIEW_KEY = 'vf_view';
+const PERIOD_LABEL: Record<Period, string> = { 1: 'hoje', 7: 'últimos 7 dias', 30: 'últimos 30 dias', 90: 'últimos 90 dias' };
 const readView = (): View => { try { return localStorage.getItem(VIEW_KEY) === 'conversas' ? 'conversas' : 'painel'; } catch { return 'painel'; } };
 const readPeriod = (): Period => {
   try { const v = Number(localStorage.getItem(PERIOD_KEY)); return ([1, 7, 30, 90] as const).find((p) => p === v) ?? 30; } catch { return 30; }
@@ -169,6 +171,7 @@ export default function App() {
               onOpenChat={(c) => { setChatWith(c.wa_id); changeView('conversas'); }}
               onNewManual={() => setManualOpen(true)}
             />
+            <BrazilMap contacts={dashboard.contacts} periodLabel={PERIOD_LABEL[period]} />
           </>
         )}
       </main>
