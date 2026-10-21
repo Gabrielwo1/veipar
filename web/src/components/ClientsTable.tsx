@@ -22,12 +22,6 @@ function initials(name: string | null) {
   return parts.length ? (parts[0][0] + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase() : '?';
 }
 
-function StatusBadge({ c }: { c: Contact }) {
-  if (isWaiting(c)) return <Badge className="gap-1.5 border-amber-200 bg-amber-50 text-amber-800"><span className="size-1.5 animate-pulse rounded-full bg-amber-500" />Aguardando</Badge>;
-  if (c.sales?.length) return <Badge className="gap-1.5 border-brand/25 bg-brand-soft text-brand-deep"><span className="size-1.5 rounded-full bg-brand" />Vendido</Badge>;
-  return <Badge variant="outline" className="gap-1.5 text-graphite"><span className="size-1.5 rounded-full bg-graphite/60" />Respondido</Badge>;
-}
-
 function SaleInput({ c, onAdd }: { c: Contact; onAdd: (c: Contact, amount: string) => Promise<boolean> }) {
   const [value, setValue] = useState('');
   const [busy, setBusy] = useState(false);
@@ -198,12 +192,7 @@ export function ClientsTable({ contacts, lines, onAdd, onOpenSales, onOpenChat, 
                     </Tooltip>
                   ) : <span className="text-sm text-muted-foreground">Orgânico</span>}
                 </TableCell>
-                <TableCell>
-                  <div className="flex flex-col items-start gap-1">
-                    <StageBadge stage={c.stage} />
-                    {isWaiting(c) && <StatusBadge c={c} />}
-                  </div>
-                </TableCell>
+                <TableCell><StageBadge stage={c.stage} /></TableCell>
                 <TableCell className="text-right">
                   <button type="button" onClick={() => onOpenSales(c)} className="group/total inline-flex flex-col items-end rounded-md px-2 py-1 hover:bg-muted">
                     <span className={cn('font-semibold tabular', !total && 'font-normal text-muted-foreground')}>{total ? brl(total) : '—'}</span>
