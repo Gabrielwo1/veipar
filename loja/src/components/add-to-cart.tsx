@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useFormStatus } from 'react-dom'
 import { addToCart } from '@/lib/actions'
 import type { Money, Product, Variant } from '@/lib/shopify'
+import { ShippingCalculator } from './shipping-calculator'
 
 function formatMoney({ amount, currencyCode }: Money) {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: currencyCode }).format(Number(amount))
@@ -26,6 +27,7 @@ export function AddToCart({ options, variants }: { options: Product['options']; 
   const [variantId, setVariantId] = useState(
     (variants.find((v) => v.availableForSale) ?? variants[0]).id,
   )
+  const [quantity, setQuantity] = useState(1)
   const variant = variants.find((v) => v.id === variantId) ?? variants[0]
   // Produto sem opção real vem com uma opção "Title" / "Default Title".
   const realOptions = options.filter((o) => !(o.optionValues.length === 1 && o.optionValues[0].name === 'Default Title'))
@@ -78,11 +80,16 @@ export function AddToCart({ options, variants }: { options: Product['options']; 
           name="quantity"
           type="number"
           min={1}
-          defaultValue={1}
+          value={quantity}
+          onChange={(e) => setQuantity(Math.max(1, Number(e.target.value) || 1))}
           className="w-20 rounded-lg border border-border bg-surface px-3 text-center"
         />
         <SubmitButton disabled={!variant.availableForSale} />
       </form>
+
+      <div className="mt-4">
+        <ShippingCalculator items={[{ variantId: variant.id, price: variant.price.amount, quantity }]} />
+      </div>
     </div>
   )
 }

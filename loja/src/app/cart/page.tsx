@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Suspense } from 'react'
+import { ShippingCalculator } from '@/components/shipping-calculator'
 import { goToCheckout, setLineQuantity } from '@/lib/actions'
 import { readCart } from '@/lib/cart'
 import { formatMoney } from '@/lib/shopify'
@@ -66,7 +67,18 @@ async function CartContent() {
           <span className="text-muted">Subtotal</span>
           <span className="font-semibold">{formatMoney(cart.cost.subtotalAmount)}</span>
         </div>
-        <p className="mt-2 text-xs text-muted">Frete e descontos são calculados no checkout.</p>
+        <p className="mt-2 text-xs text-muted">Descontos são aplicados no checkout.</p>
+        <div className="mt-4">
+          <ShippingCalculator
+            // Cotação antiga some quando o carrinho muda.
+            key={cart.lines.nodes.map((l) => `${l.id}:${l.quantity}`).join(',')}
+            items={cart.lines.nodes.map((l) => ({
+              variantId: l.merchandise.id,
+              price: l.merchandise.price.amount,
+              quantity: l.quantity,
+            }))}
+          />
+        </div>
         <form action={goToCheckout} className="mt-5">
           <button type="submit" className="w-full rounded-lg bg-brand px-5 py-3 font-semibold text-white hover:bg-brand-dark">
             Finalizar compra
