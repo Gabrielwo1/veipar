@@ -38,6 +38,9 @@ export const IconPlay = ({ className }: P) => (
 export const IconBag = ({ className }: P) => (
   <svg viewBox="0 0 24 24" className={className} {...base}><path d="M5 8h14l-1.2 12H6.2z" /><path d="M9 8V6a3 3 0 016 0v2" /></svg>
 )
+export const IconUser = ({ className }: P) => (
+  <svg viewBox="0 0 24 24" className={className} {...base}><circle cx="12" cy="8" r="4" /><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" /></svg>
+)
 export const IconArrow = ({ className }: P) => (
   <svg viewBox="0 0 24 24" className={className} {...base}><path d="M5 12h14M13 6l6 6-6 6" /></svg>
 )

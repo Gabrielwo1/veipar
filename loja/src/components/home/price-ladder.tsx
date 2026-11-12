@@ -51,7 +51,7 @@ export function PriceLadder({ products }: { products: ProductCard[] }) {
                   <Link href={`/products/${p.handle}`} className={`text-sm font-semibold underline-offset-4 hover:underline ${best ? 'text-white' : ''}`}>
                     Ver detalhes
                   </Link>
-                  {p.variants.nodes[0] && <QuickAddButton variantId={p.variants.nodes[0].id} price={price.amount} disabled={!p.availableForSale} />}
+                  {p.variants.nodes[0] && <QuickAddButton variantId={p.variants.nodes[0].id} name={p.title} price={price.amount} disabled={!p.availableForSale} />}
                 </div>
               </div>
             </Reveal>

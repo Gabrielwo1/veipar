@@ -12,6 +12,9 @@ export const SOCIAL = {
   facebook: 'https://www.facebook.com/profile.php?id=61573957084510',
 }
 
+// Contas de cliente da Shopify (pedidos, endereços), no subdomínio configurado na loja.
+export const ACCOUNT_URL = 'https://conta.veipar.com.br'
+
 export const STATS = {
   instagramFollowers: '99 mil',
   youtubeSubscribers: '30 mil',

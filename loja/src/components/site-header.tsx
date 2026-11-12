@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState, type ReactNode } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { IconClose, IconMenu } from './ui/icons'
+import { ACCOUNT_URL } from '@/lib/brand'
+import { IconClose, IconMenu, IconUser } from './ui/icons'
 
 const NAV = [
   { href: '/collections/veipar', label: 'Protetores' },
@@ -84,7 +85,17 @@ export function SiteHeader({ cart }: { cart: ReactNode }) {
             ))}
           </nav>
 
-          {cart}
+          <div className="flex items-center gap-1 md:gap-2">
+            <a
+              href={ACCOUNT_URL}
+              aria-label="Minha conta"
+              title="Minha conta"
+              className="flex h-11 w-11 items-center justify-center rounded-full text-navy transition hover:bg-ice hover:text-royal"
+            >
+              <IconUser className="h-6 w-6" />
+            </a>
+            {cart}
+          </div>
         </div>
       </header>
 
@@ -112,6 +123,10 @@ export function SiteHeader({ cart }: { cart: ReactNode }) {
                   </Link>
                 </motion.div>
               ))}
+              <a href={ACCOUNT_URL} className="mt-6 flex items-center gap-3 font-semibold text-royal">
+                <IconUser className="h-5 w-5" />
+                Minha conta e pedidos
+              </a>
             </motion.nav>
           </motion.div>
         )}

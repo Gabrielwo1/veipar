@@ -36,10 +36,12 @@ function Buttons({ disabled }: { disabled: boolean }) {
 }
 
 export function AddToCart({
+  name,
   options,
   variants,
   pieces,
 }: {
+  name: string
   options: Product['options']
   variants: Variant[]
   pieces: number | null
@@ -53,7 +55,7 @@ export function AddToCart({
   const total = { amount: String(Number(variant.price.amount) * quantity), currencyCode: variant.price.currencyCode }
 
   function trackAdd(buyNow: boolean) {
-    const params = { content_ids: [contentId(variant.id)], content_type: 'product', value: Number(total.amount), currency: 'BRL' }
+    const params = { content_ids: [contentId(variant.id)], content_type: 'product', content_name: name, value: Number(total.amount), currency: 'BRL' }
     track('AddToCart', params)
     if (buyNow) track('InitiateCheckout', { ...params, num_items: quantity })
   }

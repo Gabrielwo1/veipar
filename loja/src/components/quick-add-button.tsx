@@ -11,7 +11,7 @@ const btn =
   'relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-cyan text-navy shadow-soft transition hover:scale-110 hover:bg-royal hover:text-white disabled:opacity-40 sm:h-11 sm:w-11'
 
 // "+" dos cards. Produto com cor/variação leva para a página para escolher.
-export function QuickAddButton({ variantId, price, disabled, href }: { variantId: string; price?: string; disabled?: boolean; href?: string }) {
+export function QuickAddButton({ variantId, name, price, disabled, href }: { variantId: string; name?: string; price?: string; disabled?: boolean; href?: string }) {
   const [pending, start] = useTransition()
   const [done, setDone] = useState(false)
 
@@ -29,7 +29,7 @@ export function QuickAddButton({ variantId, price, disabled, href }: { variantId
     fd.set('quantity', '1')
     start(async () => {
       await quickAdd(fd)
-      track('AddToCart', { content_ids: [contentId(variantId)], content_type: 'product', value: Number(price ?? 0), currency: 'BRL' })
+      track('AddToCart', { content_ids: [contentId(variantId)], content_type: 'product', content_name: name, value: Number(price ?? 0), currency: 'BRL' })
       setDone(true)
       setTimeout(() => setDone(false), 1600)
     })

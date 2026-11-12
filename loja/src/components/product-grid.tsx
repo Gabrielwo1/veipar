@@ -59,6 +59,7 @@ export function ProductCardView({ product, index = 0 }: { product: ProductCard; 
             {firstVariant && (
               <QuickAddButton
                 variantId={firstVariant.id}
+                name={product.title}
                 price={price.amount}
                 disabled={!product.availableForSale}
                 href={hasOptions ? `/products/${product.handle}` : undefined}

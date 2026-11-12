@@ -64,7 +64,7 @@ async function ProductDetails({ params }: Pick<PageProps<'/products/[handle]'>, 
           </div>
           <h1 className="mt-4 font-display text-3xl font-bold leading-tight md:text-4xl">{prettyTitle(product.title)}</h1>
 
-          <AddToCart options={product.options} variants={product.variants.nodes} pieces={pieces && !/kit/i.test(product.title) ? pieces : null} />
+          <AddToCart name={product.title} options={product.options} variants={product.variants.nodes} pieces={pieces && !/kit/i.test(product.title) ? pieces : null} />
 
           <ul className="mt-6 grid grid-cols-3 gap-2 text-center text-xs">
             {[

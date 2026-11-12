@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation'
 import Script from 'next/script'
 import { useEffect, useRef } from 'react'
-import { META_PIXEL_ID, track } from '@/lib/pixel'
+import { META_PIXEL_ID, registrar, track } from '@/lib/pixel'
 
 export function MetaPixel() {
   const pathname = usePathname()
@@ -13,6 +13,7 @@ export function MetaPixel() {
   useEffect(() => {
     if (first.current) {
       first.current = false
+      registrar('PageView')
       return
     }
     track('PageView')
