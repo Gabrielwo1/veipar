@@ -27,9 +27,12 @@ export type ProductCard = {
   availableForSale: boolean
   featuredImage: Image | null
   priceRange: { minVariantPrice: Money }
+  compareAtPriceRange: { maxVariantPrice: Money }
+  // Primeira variante, para o botão "+" adicionar direto ao carrinho.
+  variants: { nodes: { id: string; availableForSale: boolean }[] }
 }
 
-export type Product = ProductCard & {
+export type Product = Omit<ProductCard, 'variants'> & {
   id: string
   description: string
   descriptionHtml: string
@@ -64,6 +67,8 @@ export type Cart = {
   checkoutUrl: string
   totalQuantity: number
   cost: { subtotalAmount: Money; totalAmount: Money }
+  discountCodes: { code: string; applicable: boolean }[]
+  discountAllocations: { discountedAmount: Money }[]
   lines: { nodes: CartLine[] }
 }
 
@@ -100,6 +105,8 @@ const PRODUCT_CARD = `
   handle title availableForSale
   featuredImage { ${IMAGE} }
   priceRange { minVariantPrice { amount currencyCode } }
+  compareAtPriceRange { maxVariantPrice { amount currencyCode } }
+  variants(first: 2) { nodes { id availableForSale } }
 `
 
 // ---------- Catálogo (cacheado; a Shopify é a fonte da verdade) ----------
@@ -124,7 +131,10 @@ export async function getProduct(handle: string): Promise<Product | null> {
     `
     query Product($handle: String!) ${CONTEXT} {
       product(handle: $handle) {
-        id ${PRODUCT_CARD}
+        id handle title availableForSale
+        featuredImage { ${IMAGE} }
+        priceRange { minVariantPrice { amount currencyCode } }
+        compareAtPriceRange { maxVariantPrice { amount currencyCode } }
         description descriptionHtml
         options { name optionValues { name } }
         images(first: 10) { nodes { ${IMAGE} } }
@@ -178,6 +188,8 @@ export async function getCollection(handle: string): Promise<Collection | null> 
 
 const CART = `
   id checkoutUrl totalQuantity
+  discountCodes { code applicable }
+  discountAllocations { discountedAmount { amount currencyCode } }
   cost { subtotalAmount { amount currencyCode } totalAmount { amount currencyCode } }
   lines(first: 100) {
     nodes {
@@ -252,6 +264,20 @@ export async function updateCartLine(cartId: string, lineId: string, quantity: n
   )
   assertNoUserErrors(data.cartLinesUpdate.userErrors)
   return data.cartLinesUpdate.cart
+}
+
+export async function setCartDiscountCodes(cartId: string, discountCodes: string[], buyerIp?: string): Promise<Cart> {
+  const data = await storefront<{ cartDiscountCodesUpdate: { cart: Cart; userErrors: UserError[] } }>(
+    `
+    mutation CartDiscountCodesUpdate($cartId: ID!, $discountCodes: [String!]!) ${CONTEXT} {
+      cartDiscountCodesUpdate(cartId: $cartId, discountCodes: $discountCodes) { cart { ${CART} } userErrors { field message } }
+    }
+  `,
+    { cartId, discountCodes },
+    buyerIp,
+  )
+  assertNoUserErrors(data.cartDiscountCodesUpdate.userErrors)
+  return data.cartDiscountCodesUpdate.cart
 }
 
 export function formatMoney({ amount, currencyCode }: Money): string {

@@ -1,37 +1,60 @@
 import Link from 'next/link'
+import { Categories } from '@/components/home/categories'
+import { Faq } from '@/components/home/faq'
+import { FounderTeaser } from '@/components/home/founder-teaser'
+import { Hero } from '@/components/home/hero'
+import { HowTo } from '@/components/home/how-to'
+import { InstagramReels } from '@/components/home/instagram-reels'
+import { PatentBanner } from '@/components/home/patent-banner'
+import { PriceLadder } from '@/components/home/price-ladder'
+import { ProblemSolution } from '@/components/home/problem-solution'
+import { SectionTitle } from '@/components/home/section-title'
+import { TrustBar } from '@/components/home/trust-bar'
 import { ProductGrid } from '@/components/product-grid'
-import { getProducts } from '@/lib/shopify'
+import { IconArrow } from '@/components/ui/icons'
+import { piecesFromTitle } from '@/lib/brand'
+import { formatMoney, getProducts } from '@/lib/shopify'
 
 export default async function Home() {
   const products = await getProducts()
 
+  const perPiece = products
+    .map((p) => {
+      const n = piecesFromTitle(p.title)
+      return n && n >= 100 && !/kit/i.test(p.title) ? Number(p.priceRange.minVariantPrice.amount) / n : null
+    })
+    .filter((v): v is number => v !== null)
+  const minPerPiece = perPiece.length ? formatMoney({ amount: String(Math.min(...perPiece)), currencyCode: 'BRL' }) : null
+
   return (
     <>
-      <section className="bg-foreground text-white">
-        <div className="mx-auto max-w-6xl px-4 py-16 md:py-24">
-          <p className="text-sm font-semibold uppercase tracking-widest text-orange-300">Aço Galvalume AZ 150</p>
-          <h1 className="mt-3 max-w-2xl text-3xl font-extrabold leading-tight md:text-5xl">
-            Chega de goteira no parafuso da telha.
-          </h1>
-          <p className="mt-4 max-w-xl text-white/75">
-            O protetor Veipar veda o ponto de fixação, protege a borracha do sol e evita ferrugem.
-            Encaixa sem ferramenta.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/collections/colecao-veipar" className="rounded-lg bg-brand px-5 py-3 font-semibold hover:bg-brand-dark">
-              Ver protetores
+      <Hero minPerPiece={minPerPiece} />
+      <TrustBar />
+      <Categories />
+
+      <section className="mx-auto max-w-7xl px-4 pt-24">
+        <SectionTitle
+          eyebrow="Loja oficial"
+          title="Mais vendidos"
+          action={
+            <Link href="/collections/colecao-veipar" className="inline-flex items-center gap-1 font-semibold text-royal hover:gap-2">
+              Ver tudo <IconArrow className="h-5 w-5" />
             </Link>
-            <Link href="/collections/combos" className="rounded-lg border border-white/30 px-5 py-3 font-semibold hover:bg-white/10">
-              Kits com PU
-            </Link>
-          </div>
+          }
+        />
+        <div className="mt-8">
+          <ProductGrid products={products.slice(0, 8)} />
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-12">
-        <h2 className="mb-6 text-2xl font-bold">Mais vendidos</h2>
-        <ProductGrid products={products} />
-      </section>
+      <ProblemSolution />
+      <HowTo />
+      <PatentBanner />
+      <PriceLadder products={products} />
+      <InstagramReels />
+      <FounderTeaser />
+      <Faq />
+      <div className="h-24" />
     </>
   )
 }

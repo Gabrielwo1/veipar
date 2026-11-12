@@ -4,19 +4,48 @@ import { refresh } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { buyerIp, readCart, saveCartId } from './cart'
 import { buscarEndereco, cotarFrete, normalizeCep, type FreteItem, type FreteOpcao } from './frete'
-import { addCartLines, createCart, updateCartLine } from './shopify'
+import { addCartLines, createCart, setCartDiscountCodes, updateCartLine } from './shopify'
 
-export async function addToCart(formData: FormData) {
+async function addLines(formData: FormData) {
   const merchandiseId = String(formData.get('variantId') || '')
   const quantity = Math.max(1, Number(formData.get('quantity')) || 1)
-  if (!merchandiseId) return
+  if (!merchandiseId) return null
 
   const ip = await buyerIp()
   const lines = [{ merchandiseId, quantity }]
   const current = await readCart()
   const cart = current ? await addCartLines(current.id, lines, ip) : await createCart(lines, ip)
   await saveCartId(cart.id)
-  redirect('/cart')
+  return cart
+}
+
+export async function addToCart(formData: FormData) {
+  if (await addLines(formData)) redirect('/cart')
+}
+
+// Botão "+" dos cards: adiciona sem sair da página.
+export async function quickAdd(formData: FormData) {
+  await addLines(formData)
+  refresh()
+}
+
+// "Comprar agora": adiciona e vai direto para o checkout da Shopify.
+export async function buyNow(formData: FormData) {
+  const cart = await addLines(formData)
+  if (cart) redirect(cart.checkoutUrl)
+}
+
+export async function applyCoupon(formData: FormData) {
+  const code = String(formData.get('code') || '').trim().toUpperCase()
+  const cart = await readCart()
+  if (!cart) {
+    // Sem carrinho ainda: cria vazio já com o cupom, para valer na próxima compra.
+    const created = await createCart([], await buyerIp())
+    await saveCartId((await setCartDiscountCodes(created.id, code ? [code] : [])).id)
+  } else {
+    await setCartDiscountCodes(cart.id, code ? [code] : [], await buyerIp())
+  }
+  refresh()
 }
 
 export async function setLineQuantity(formData: FormData) {
