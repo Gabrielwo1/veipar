@@ -27,8 +27,11 @@ export function InstagramReels() {
 
   return (
     <section className="relative mt-24 overflow-hidden bg-gradient-to-b from-navy-2 to-navy py-20 text-white md:py-28">
-      <div className="absolute -left-40 top-0 h-96 w-96 rounded-full bg-royal/40 blur-3xl" aria-hidden />
-      <div className="absolute -right-20 bottom-0 h-80 w-80 rounded-full bg-cyan/20 blur-3xl" aria-hidden />
+      <div
+        className="absolute inset-0"
+        style={{ background: 'radial-gradient(40rem 24rem at 0% 0%, rgb(10 91 214 / 0.35), transparent 70%), radial-gradient(32rem 20rem at 100% 100%, rgb(0 163 224 / 0.18), transparent 70%)' }}
+        aria-hidden
+      />
 
       <div className="relative mx-auto max-w-7xl px-4">
         <Reveal>
@@ -78,10 +81,10 @@ export function InstagramReels() {
           >
             <Image src={`/img/ig/${r.code}.jpg`} alt="" fill sizes="(min-width: 1024px) 19vw, (min-width: 768px) 22vw, 62vw" className="object-cover transition duration-700 group-hover:scale-105" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/0 to-black/20" />
-            <span className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-black/40 px-2.5 py-1 text-[11px] font-semibold backdrop-blur">
+            <span className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-black/55 px-2.5 py-1 text-[11px] font-semibold">
               <IconInstagram className="h-3.5 w-3.5" /> Reels
             </span>
-            <span className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 backdrop-blur-md transition group-hover:scale-110 group-hover:bg-cyan">
+            <span className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 ring-1 ring-white/40 transition group-hover:scale-110 group-hover:bg-cyan">
               <IconPlay className="ml-1 h-7 w-7 text-white group-hover:text-navy" />
             </span>
             <p className="absolute inset-x-0 bottom-0 p-4 font-display text-[15px] font-semibold leading-snug">{r.title}</p>

@@ -55,9 +55,7 @@ export function SiteHeader({ cart }: { cart: ReactNode }) {
       </div>
 
       <header
-        className={`sticky top-0 z-40 transition-all duration-300 ${
-          scrolled ? 'bg-white/85 shadow-soft backdrop-blur-xl' : 'bg-white'
-        }`}
+        className={`sticky top-0 z-40 bg-white transition-shadow duration-300 ${scrolled ? 'shadow-soft' : ''}`}
       >
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 md:h-20">
           <button

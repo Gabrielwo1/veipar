@@ -12,12 +12,11 @@ const WORDS = ['Goteira', 'no', 'parafuso', 'da', 'telha?']
 export function Hero({ minPerPiece }: { minPerPiece: string | null }) {
   const ref = useRef<HTMLElement>(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
-  const bgY = useTransform(scrollYProgress, [0, 1], ['0%', '25%'])
-  const cardY = useTransform(scrollYProgress, [0, 1], ['0%', '-30%'])
+  const bgY = useTransform(scrollYProgress, [0, 1], ['0%', '15%'])
 
   return (
     <section ref={ref} className="relative isolate overflow-hidden bg-navy text-white">
-      <motion.div className="absolute inset-0 -z-10" style={{ y: bgY }}>
+      <motion.div className="absolute inset-0 -z-10 will-change-transform" style={{ y: bgY }}>
         <Image src="/img/gen/hero.jpg" alt="" fill priority sizes="100vw" className="object-cover object-[70%_center]" />
       </motion.div>
       <div className="absolute inset-0 -z-10 bg-gradient-to-r from-navy via-navy/85 to-navy/10" />
@@ -28,7 +27,7 @@ export function Hero({ minPerPiece }: { minPerPiece: string | null }) {
           <motion.p
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-cyan backdrop-blur"
+            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-cyan"
           >
             <span className="h-1.5 w-1.5 rounded-full bg-cyan" /> Tecnologia patenteada · INPI
           </motion.p>
@@ -75,7 +74,7 @@ export function Hero({ minPerPiece }: { minPerPiece: string | null }) {
               Comprar agora <IconArrow className="h-5 w-5" />
             </Link>
             <a href={whatsappLink()} target="_blank" rel="noopener"
-              className="inline-flex items-center gap-2 rounded-full border border-white/25 px-7 py-4 font-semibold backdrop-blur transition hover:bg-white/10">
+              className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-navy/40 px-7 py-4 font-semibold transition hover:bg-white/10">
               <IconWhatsApp className="h-5 w-5" /> Chamar no WhatsApp
             </a>
           </motion.div>
@@ -99,12 +98,12 @@ export function Hero({ minPerPiece }: { minPerPiece: string | null }) {
           </motion.dl>
         </div>
 
-        <motion.div style={{ y: cardY }} className="relative mx-auto hidden w-full max-w-sm md:block">
+        <div className="relative mx-auto hidden w-full max-w-sm md:block">
           <motion.div
             initial={{ opacity: 0, scale: 0.85, rotate: -6 }}
             animate={{ opacity: 1, scale: 1, rotate: -3 }}
             transition={{ delay: 0.5, type: 'spring', stiffness: 120, damping: 16 }}
-            className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border border-white/15 bg-white/10 p-3 shadow-lift backdrop-blur-md"
+            className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border border-white/15 bg-navy-2/80 p-3 shadow-lift"
           >
             <div className="relative h-full overflow-hidden rounded-[1.5rem]">
               <Image src="/img/brand/peca-preta.jpg" alt="Protetor Veipar preto" fill sizes="380px" className="object-cover" />
@@ -122,7 +121,7 @@ export function Hero({ minPerPiece }: { minPerPiece: string | null }) {
             <p className="text-[11px] font-semibold uppercase tracking-wider text-muted">A partir de</p>
             <p className="font-display text-2xl font-extrabold text-royal">{minPerPiece}<span className="text-sm font-semibold text-muted">/peça</span></p>
           </motion.div>}
-        </motion.div>
+        </div>
       </div>
     </section>
   )

@@ -20,7 +20,7 @@ export function Categories() {
                 <p className="text-xs font-semibold uppercase tracking-widest text-cyan">{c.subtitle}</p>
                 <div className="mt-1 flex items-end justify-between gap-2">
                   <h3 className="font-display text-2xl font-bold leading-tight">{c.title}</h3>
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur transition group-hover:bg-cyan group-hover:text-navy">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/20 transition group-hover:bg-cyan group-hover:text-navy">
                     <IconArrow className="h-5 w-5 transition group-hover:translate-x-0.5" />
                   </span>
                 </div>

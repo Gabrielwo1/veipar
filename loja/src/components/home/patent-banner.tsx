@@ -62,7 +62,7 @@ export function PatentBanner() {
                   href={p.url}
                   target="_blank"
                   rel="noopener"
-                  className="group block h-full rounded-2xl border border-white/15 bg-white/5 p-5 backdrop-blur-md transition hover:border-cyan/60 hover:bg-white/10"
+                  className="group block h-full rounded-2xl border border-white/15 bg-navy-2/70 p-5 transition hover:border-cyan/60 hover:bg-white/10"
                 >
                   <p className="text-[11px] font-semibold uppercase tracking-widest text-cyan">{p.status}</p>
                   <p className="mt-2 font-display text-xl font-bold">{p.title}</p>

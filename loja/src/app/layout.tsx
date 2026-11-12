@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { DM_Sans, Jost } from 'next/font/google'
 import { Suspense } from 'react'
 import { CartButton, CartLink } from '@/components/cart-link'
-import { CouponPopup } from '@/components/coupon-popup'
 import { MetaPixel } from '@/components/meta-pixel'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
@@ -34,7 +33,6 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
         <main className="flex-1">{children}</main>
         <SiteFooter />
         <WhatsAppFab />
-        <CouponPopup />
         <MetaPixel />
       </body>
     </html>
