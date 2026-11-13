@@ -1,6 +1,5 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { piecesFromTitle } from '@/lib/brand'
 import { formatMoney, type ProductCard } from '@/lib/shopify'
 import { QuickAddButton } from './quick-add-button'
 import { Reveal } from './ui/reveal'
@@ -18,9 +17,6 @@ export function ProductCardView({ product, index = 0 }: { product: ProductCard; 
   const price = product.priceRange.minVariantPrice
   const compare = product.compareAtPriceRange.maxVariantPrice
   const onSale = Number(compare.amount) > Number(price.amount)
-  const pieces = piecesFromTitle(product.title)
-  // Kit leva PU e bico junto: preço por peça ali enganaria.
-  const perPiece = pieces && pieces >= 100 && !/kit/i.test(product.title) ? Number(price.amount) / pieces : null
   const firstVariant = product.variants.nodes[0]
   const hasOptions = product.variants.nodes.length > 1
 
@@ -50,11 +46,6 @@ export function ProductCardView({ product, index = 0 }: { product: ProductCard; 
             <div>
               {onSale && <p className="text-xs text-muted line-through">{formatMoney(compare)}</p>}
               <p className="font-display text-lg font-bold text-royal sm:text-xl">{formatMoney(price)}</p>
-              {perPiece && (
-                <p className="text-[11px] font-medium text-muted">
-                  {formatMoney({ amount: String(perPiece), currencyCode: price.currencyCode })}/peça
-                </p>
-              )}
             </div>
             {firstVariant && (
               <QuickAddButton

@@ -4,9 +4,9 @@ import { SectionTitle } from './section-title'
 
 // Os três passos do reels, com fotos reais de obra do @veiparbrasil.
 const STEPS = [
-  { n: 1, title: 'PU com o bico injetor', text: 'Rosqueie o bico Veipar na bisnaga e encha a cavidade da tampa.', image: '/img/ig/DfQREPCJf2z.jpg' },
-  { n: 2, title: 'Encaixe sobre o parafuso', text: 'Coloque a tampa por cima da cabeça do parafuso da telha.', image: '/img/ig/DfaiNFRJ7mF.jpg' },
-  { n: 3, title: 'Uma leve girada', text: 'Gire de leve para espalhar o PU e vedar. Pronto!', image: '/img/ig/DfXT2osqhmN.jpg' },
+  { n: 1, title: 'PU com o bico injetor', text: 'Rosqueie o bico Veipar na bisnaga e encha a cavidade da tampa.', image: '/img/ig/DfXT2osqhmN.jpg' },
+  { n: 2, title: 'Encaixe sobre o parafuso', text: 'Coloque a tampa por cima da cabeça do parafuso da telha.', image: '/img/ig/DfQREPCJf2z.jpg' },
+  { n: 3, title: 'Uma leve girada', text: 'Gire de leve para espalhar o PU e vedar. Pronto!', image: '/img/ig/DfaiNFRJ7mF.jpg' },
 ]
 
 export function HowTo() {

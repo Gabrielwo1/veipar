@@ -12,23 +12,14 @@ import { SectionTitle } from '@/components/home/section-title'
 import { TrustBar } from '@/components/home/trust-bar'
 import { ProductGrid } from '@/components/product-grid'
 import { IconArrow } from '@/components/ui/icons'
-import { piecesFromTitle } from '@/lib/brand'
-import { formatMoney, getProducts } from '@/lib/shopify'
+import { getProducts } from '@/lib/shopify'
 
 export default async function Home() {
   const products = await getProducts()
 
-  const perPiece = products
-    .map((p) => {
-      const n = piecesFromTitle(p.title)
-      return n && n >= 100 && !/kit/i.test(p.title) ? Number(p.priceRange.minVariantPrice.amount) / n : null
-    })
-    .filter((v): v is number => v !== null)
-  const minPerPiece = perPiece.length ? formatMoney({ amount: String(Math.min(...perPiece)), currencyCode: 'BRL' }) : null
-
   return (
     <>
-      <Hero minPerPiece={minPerPiece} />
+      <Hero />
       <TrustBar />
       <Categories />
 

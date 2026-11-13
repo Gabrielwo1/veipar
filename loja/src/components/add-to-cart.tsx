@@ -39,12 +39,10 @@ export function AddToCart({
   name,
   options,
   variants,
-  pieces,
 }: {
   name: string
   options: Product['options']
   variants: Variant[]
-  pieces: number | null
 }) {
   const [variantId, setVariantId] = useState((variants.find((v) => v.availableForSale) ?? variants[0]).id)
   const [quantity, setQuantity] = useState(1)
@@ -73,11 +71,6 @@ export function AddToCart({
       <div className="flex flex-wrap items-end gap-3">
         <p className="font-display text-4xl font-extrabold text-royal">{formatMoney(variant.price)}</p>
         {onSale && <p className="pb-1 text-muted line-through">{formatMoney(variant.compareAtPrice!)}</p>}
-        {pieces && (
-          <p className="mb-1 rounded-full bg-ice px-3 py-1 text-xs font-semibold text-royal">
-            {formatMoney({ amount: String(Number(variant.price.amount) / pieces), currencyCode: variant.price.currencyCode })} por peça
-          </p>
-        )}
       </div>
 
       {realOptions.map((option) => {

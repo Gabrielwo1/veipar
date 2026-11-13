@@ -10,7 +10,6 @@ import { SectionTitle } from '@/components/home/section-title'
 import { ProductGallery } from '@/components/product-gallery'
 import { ProductGrid, prettyTitle } from '@/components/product-grid'
 import { IconPatent, IconShield, IconTruck } from '@/components/ui/icons'
-import { piecesFromTitle } from '@/lib/brand'
 import { contentId } from '@/lib/pixel'
 import { getProduct, getProducts } from '@/lib/shopify'
 
@@ -36,7 +35,6 @@ async function ProductDetails({ params }: Pick<PageProps<'/products/[handle]'>, 
   const [product, all] = await Promise.all([getProduct(handle), getProducts()])
   if (!product) notFound()
 
-  const pieces = piecesFromTitle(product.title)
   const related = all.filter((p) => p.handle !== product.handle).slice(0, 4)
 
   return (
@@ -64,7 +62,7 @@ async function ProductDetails({ params }: Pick<PageProps<'/products/[handle]'>, 
           </div>
           <h1 className="mt-4 font-display text-3xl font-bold leading-tight md:text-4xl">{prettyTitle(product.title)}</h1>
 
-          <AddToCart name={product.title} options={product.options} variants={product.variants.nodes} pieces={pieces && !/kit/i.test(product.title) ? pieces : null} />
+          <AddToCart name={product.title} options={product.options} variants={product.variants.nodes} />
 
           <ul className="mt-6 grid grid-cols-3 gap-2 text-center text-xs">
             {[

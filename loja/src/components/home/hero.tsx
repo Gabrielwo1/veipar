@@ -9,7 +9,7 @@ import { IconArrow, IconWhatsApp } from '../ui/icons'
 
 const WORDS = ['Goteira', 'no', 'parafuso', 'da', 'telha?']
 
-export function Hero({ minPerPiece }: { minPerPiece: string | null }) {
+export function Hero() {
   const ref = useRef<HTMLElement>(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
   const bgY = useTransform(scrollYProgress, [0, 1], ['0%', '15%'])
@@ -98,29 +98,46 @@ export function Hero({ minPerPiece }: { minPerPiece: string | null }) {
           </motion.dl>
         </div>
 
-        <div className="relative mx-auto hidden w-full max-w-sm md:block">
+        <div className="relative mx-auto w-full max-w-md md:max-w-lg">
           <motion.div
-            initial={{ opacity: 0, scale: 0.85, rotate: -6 }}
-            animate={{ opacity: 1, scale: 1, rotate: -3 }}
-            transition={{ delay: 0.5, type: 'spring', stiffness: 120, damping: 16 }}
-            className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border border-white/15 bg-navy-2/80 p-3 shadow-lift"
+            initial={{ opacity: 0, y: 40, scale: 0.94 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ delay: 0.4, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+            className="relative aspect-[3/4]"
           >
-            <div className="relative h-full overflow-hidden rounded-[1.5rem]">
-              <Image src="/img/brand/peca-preta.jpg" alt="Protetor Veipar preto" fill sizes="380px" className="object-cover" />
+            {/* Halo atrás do conjunto, para ele "acender" sobre o fundo escuro. */}
+            <div className="absolute inset-[12%] -z-10 rounded-full bg-[radial-gradient(circle,rgb(0_163_224/0.35),transparent_70%)]" />
+            <Image
+              src="/img/gen/conjunto.jpg"
+              alt="Linha Veipar: protetores galvalume e coloridos, PU 40 e bico injetor"
+              fill
+              priority
+              sizes="(min-width: 768px) 512px, 90vw"
+              className="object-cover [mask-image:radial-gradient(ellipse_62%_58%_at_50%_58%,black_60%,transparent_100%)]"
+            />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.6 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 1.1, type: 'spring', stiffness: 160, damping: 14 }}
+            className="absolute bottom-[8%] left-0 h-24 w-24 md:-left-4 md:h-32 md:w-32"
+          >
+            <div className="relative h-full w-full animate-spin-slow rounded-full bg-white p-1.5 shadow-lift">
+              <Image src="/img/brand/selo-original.png" alt="Produto 100% original Veipar" fill sizes="128px" className="object-contain p-1" />
             </div>
           </motion.div>
-          <div className="absolute -bottom-8 -left-10 h-32 w-32 animate-spin-slow rounded-full bg-white p-1.5 shadow-lift">
-            <Image src="/img/brand/selo-original.png" alt="Produto 100% original Veipar" fill sizes="128px" className="object-contain p-1" />
-          </div>
-          {minPerPiece && <motion.div
-            initial={{ opacity: 0, x: 30 }}
+          <motion.ul
+            initial={{ opacity: 0, x: 24 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 1.2 }}
-            className="absolute -right-6 top-10 rounded-2xl bg-white px-4 py-3 text-navy shadow-lift"
+            transition={{ delay: 1.3 }}
+            className="absolute -right-2 top-0 hidden space-y-2 text-sm font-semibold lg:block"
           >
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted">A partir de</p>
-            <p className="font-display text-2xl font-extrabold text-royal">{minPerPiece}<span className="text-sm font-semibold text-muted">/peça</span></p>
-          </motion.div>}
+            {['Natural e colorido', 'PU 40 + bico injetor', 'Trapezoidal e ondulada'].map((t) => (
+              <li key={t} className="flex items-center gap-2 rounded-full bg-white px-3.5 py-1.5 text-navy shadow-lift">
+                <span className="h-1.5 w-1.5 rounded-full bg-cyan" /> {t}
+              </li>
+            ))}
+          </motion.ul>
         </div>
       </div>
     </section>
