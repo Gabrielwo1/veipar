@@ -230,7 +230,9 @@ export async function createCart(lines: CartLineInput[], buyerIp?: string): Prom
       cartCreate(input: $input) { cart { ${CART} } userErrors { field message } }
     }
   `,
-    { input: { lines, buyerIdentity: { countryCode: 'BR' } } },
+    // O atributo com "_" não aparece no checkout, mas vai para o pedido: é como o /painel
+    // separa as vendas da loja nova das do site antigo.
+    { input: { lines, buyerIdentity: { countryCode: 'BR' }, attributes: [{ key: '_origem', value: 'loja-nova' }] } },
     buyerIp,
   )
   assertNoUserErrors(data.cartCreate.userErrors)

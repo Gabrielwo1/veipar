@@ -37,6 +37,8 @@ export async function admin<T>(query: string, variables: Record<string, unknown>
     cache: 'no-store',
   })
   const json = (await res.json()) as { data?: T; errors?: unknown }
+  // Escopos mudaram (app reinstalado): o próximo pedido busca um token novo.
+  if (JSON.stringify(json.errors ?? '').includes('ACCESS_DENIED')) token = null
   if (!res.ok || json.errors || !json.data) throw new Error(`Shopify Admin: ${JSON.stringify(json.errors ?? res.status)}`)
   return json.data
 }
@@ -46,6 +48,7 @@ export type Pedido = {
   cancelledAt: string | null
   displayFinancialStatus: string | null
   sourceName: string | null
+  customAttributes: { key: string; value: string | null }[]
   totalPriceSet: { shopMoney: { amount: string } }
   customer: { numberOfOrders: string } | null
   shippingAddress: { provinceCode: string | null } | null
@@ -63,7 +66,7 @@ export async function pedidosDesde(desde: Date): Promise<Pedido[]> {
       `query Pedidos($q: String!, $after: String) {
         orders(first: 250, after: $after, query: $q, sortKey: CREATED_AT) {
           nodes {
-            createdAt cancelledAt displayFinancialStatus sourceName
+            createdAt cancelledAt displayFinancialStatus sourceName customAttributes { key value }
             totalPriceSet { shopMoney { amount } }
             customer { numberOfOrders }
             shippingAddress { provinceCode }

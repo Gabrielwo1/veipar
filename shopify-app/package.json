@@ -1,0 +1,11 @@
+{
+  "name": "veipar-shopify-app",
+  "private": true,
+  "description": "Configuração do app \"Claude app\" da Shopify (escopos da Admin API usados pela loja e pelo /painel).",
+  "scripts": {
+    "deploy": "shopify app deploy"
+  },
+  "devDependencies": {
+    "@shopify/cli": "5.0.1"
+  }
+}

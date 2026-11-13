@@ -66,6 +66,7 @@ function resumirVendas(pedidos: Pedido[]) {
     estados: contar(validos.map((p) => p.shippingAddress?.provinceCode ?? '—')).slice(0, 10),
     canais: contar(validos.map((p) => p.sourceName ?? 'outro')),
     novos: validos.filter((p) => p.customer?.numberOfOrders === '1').length,
+    lojaNova: validos.filter((p) => p.customAttributes.some((a) => a.key === '_origem' && a.value === 'loja-nova')).length,
   }
 }
 
@@ -134,8 +135,8 @@ async function Painel({ searchParams }: { searchParams: PageProps<'/painel'>['se
         <Kpi titulo="Visitantes" valor={m ? num(m.visitantes) : '—'} detalhe={m ? `${num(m.visualizacoes)} páginas vistas` : 'loja nova'} />
         <Kpi
           titulo="Conversão"
-          valor={m && v ? pct(v.pedidos, m.sessoes) : '—'}
-          detalhe={m ? `${num(m.sessoes)} visitas` : 'pedidos ÷ visitas'}
+          valor={m && v ? pct(v.lojaNova, m.sessoes) : '—'}
+          detalhe={m && v ? `${num(v.lojaNova)} pedidos em ${num(m.sessoes)} visitas da loja nova` : 'pedidos ÷ visitas'}
         />
       </div>
 
@@ -157,7 +158,7 @@ async function Painel({ searchParams }: { searchParams: PageProps<'/painel'>['se
                 { nome: 'Viram um produto', total: m.funil.produto },
                 { nome: 'Colocaram no carrinho', total: m.funil.carrinho },
                 { nome: 'Foram para o checkout', total: m.funil.checkout },
-                ...(v ? [{ nome: 'Compraram (Shopify)', total: v.pedidos }] : []),
+                ...(v ? [{ nome: 'Compraram', total: v.lojaNova }] : []),
               ]}
             />
           ) : (
@@ -191,7 +192,7 @@ async function Painel({ searchParams }: { searchParams: PageProps<'/painel'>['se
       </div>
 
       <p className="mt-8 text-xs text-muted">
-        Vendas: todos os pedidos da Shopify no período (site antigo e loja nova). Acessos: só a loja nova, contados desde que o
+        Vendas: todos os pedidos da Shopify no período (site antigo e loja nova); conversão e funil contam só os pedidos feitos pela loja nova. Acessos: só a loja nova, contados desde que o
         painel foi ligado. Horário de Brasília.
       </p>
     </div>

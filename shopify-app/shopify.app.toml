@@ -1,0 +1,16 @@
+# App "Claude app" do Dev Dashboard, instalado na loja Veipar. Não tem tela própria:
+# só serve para a loja nova (veipar-loja) usar a Admin API. Para mudar os escopos,
+# edite aqui e rode `npm run deploy` (cria e lança uma versão nova).
+client_id = "de9ccc78741a203694df8e6909488712"
+name = "Claude app"
+application_url = "https://example.com"
+embedded = false
+
+[access_scopes]
+scopes = "read_products,write_products,read_inventory,write_inventory,read_discounts,write_discounts,write_files,read_orders,read_customers"
+
+[auth]
+redirect_urls = [ "https://example.com/api/auth" ]
+
+[webhooks]
+api_version = "2026-10"
