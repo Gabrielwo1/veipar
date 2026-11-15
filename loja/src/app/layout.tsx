@@ -16,7 +16,6 @@ export const metadata: Metadata = {
   title: { default: 'Veipar · Proteção para parafusos de telhas', template: '%s · Veipar' },
   description:
     'Protetor de parafuso de telha patenteado, em aço Galvalume AZ 150. Acaba com goteira, ferrugem e borracha ressecada. Envio para todo o Brasil.',
-  icons: { icon: '/img/brand/logo.png' },
 }
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
