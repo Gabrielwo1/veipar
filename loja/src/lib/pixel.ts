@@ -1,6 +1,6 @@
 // Meta Pixel (Facebook). O PageView inicial sai no script de init; os demais eventos usam track().
 // Cada evento também vai para /api/evento, que alimenta o /painel.
-export const META_PIXEL_ID = '2377503623087155'
+export const META_PIXEL_ID = '2179083582958642'
 
 type Fbq = (cmd: 'track' | 'init', event: string, params?: Record<string, unknown>) => void
 type PixelEvent = 'PageView' | 'ViewContent' | 'AddToCart' | 'InitiateCheckout'
