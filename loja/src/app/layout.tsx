@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { DM_Sans, Jost } from 'next/font/google'
 import { Suspense } from 'react'
 import { CartButton, CartLink } from '@/components/cart-link'
-import { MetaPixel } from '@/components/meta-pixel'
+import { MetaPixel, MetaPixelHead } from '@/components/meta-pixel'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { WhatsAppFab } from '@/components/whatsapp-fab'
@@ -26,6 +26,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html lang="pt-BR" className={`${jost.variable} ${dmSans.variable} h-full antialiased`}>
+      <head>
+        <MetaPixelHead />
+      </head>
       <body className="flex min-h-full flex-col font-sans">
         <SiteHeader
           cart={
