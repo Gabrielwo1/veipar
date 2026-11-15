@@ -1,10 +1,11 @@
 import 'server-only'
 import { cacheLife, cacheTag } from 'next/cache'
 
-// Storefront API da loja Shopify que já existe (veipar.com.br).
+// Storefront API da loja Shopify. Usamos o domínio .myshopify.com, que continua na Shopify
+// mesmo depois que o veipar.com.br passar a apontar para esta loja na Vercel.
 // Sem token funciona para produtos, coleções, busca e carrinho; com o token privado
 // do canal Headless liberamos metafields, menus e limites maiores.
-const DOMAIN = process.env.SHOPIFY_STORE_DOMAIN || 'veipar.com.br'
+const DOMAIN = process.env.SHOPIFY_STORE_DOMAIN || 'xn7tfb-iw.myshopify.com'
 const API_VERSION = process.env.SHOPIFY_API_VERSION || '2026-10'
 const PRIVATE_TOKEN = process.env.SHOPIFY_STOREFRONT_PRIVATE_TOKEN
 
@@ -284,4 +285,25 @@ export async function setCartDiscountCodes(cartId: string, discountCodes: string
 
 export function formatMoney({ amount, currencyCode }: Money): string {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: currencyCode }).format(Number(amount))
+}
+
+export type Policy = { title: string; handle: string; body: string }
+
+// Políticas cadastradas em Configurações → Políticas da Shopify.
+export async function getPolicies(): Promise<Policy[]> {
+  'use cache'
+  cacheLife('hours')
+  cacheTag('policies')
+  const fields = 'title handle body'
+  const data = await storefront<{ shop: Record<string, Policy | null> }>(`
+    query Policies ${CONTEXT} {
+      shop {
+        privacyPolicy { ${fields} }
+        refundPolicy { ${fields} }
+        shippingPolicy { ${fields} }
+        termsOfService { ${fields} }
+      }
+    }
+  `)
+  return Object.values(data.shop).filter((p): p is Policy => p !== null)
 }

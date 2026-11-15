@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { ADDRESS, SOCIAL, whatsappLink } from '@/lib/brand'
+import { ACCOUNT_URL, ADDRESS, SOCIAL, whatsappLink } from '@/lib/brand'
 import { IconFacebook, IconInstagram, IconTikTok, IconWhatsApp, IconYouTube } from './ui/icons'
 
 const COLUMNS = [
@@ -25,10 +25,10 @@ const COLUMNS = [
   {
     title: 'Ajuda',
     links: [
-      { href: 'https://veipar.com.br/policies/refund-policy', label: 'Trocas e devoluções' },
-      { href: 'https://veipar.com.br/policies/privacy-policy', label: 'Privacidade' },
-      { href: 'https://veipar.com.br/policies/terms-of-service', label: 'Termos de serviço' },
-      { href: 'https://veipar.com.br/policies/contact-information', label: 'Contato' },
+      { href: '/policies/refund-policy', label: 'Trocas e devoluções' },
+      { href: '/policies/privacy-policy', label: 'Privacidade' },
+      { href: '/policies/terms-of-service', label: 'Termos de serviço' },
+      { href: ACCOUNT_URL, label: 'Minha conta' },
     ],
   },
 ]
