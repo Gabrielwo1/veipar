@@ -22,8 +22,8 @@ export function Hero() {
       <div className="absolute inset-0 -z-10 bg-gradient-to-r from-navy via-navy/85 to-navy/10" />
       <div className="absolute inset-0 -z-10 bg-gradient-to-t from-navy via-transparent to-transparent" />
 
-      <div className="mx-auto grid min-h-[620px] max-w-7xl items-center gap-10 px-4 pb-20 pt-14 md:min-h-[680px] md:grid-cols-[1.25fr_1fr]">
-        <div>
+      <div className="relative mx-auto grid min-h-[640px] max-w-7xl items-center gap-10 px-4 pb-24 pt-14 md:min-h-[680px] md:grid-cols-[1.25fr_1fr] md:pb-20">
+        <div className="relative z-10">
           <motion.p
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -98,29 +98,30 @@ export function Hero() {
           </motion.dl>
         </div>
 
-        <div className="relative mx-auto w-full max-w-md md:max-w-lg">
+        {/* No celular o conjunto vira parte do fundo, atrás dos botões; no desktop ocupa a coluna da direita. */}
+        <div className="pointer-events-none absolute -right-20 bottom-0 w-[80%] max-w-sm opacity-60 sm:opacity-80 md:pointer-events-auto md:relative md:right-auto md:mx-auto md:w-full md:max-w-lg md:opacity-100">
           <motion.div
             initial={{ opacity: 0, y: 40, scale: 0.94 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ delay: 0.4, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-            className="relative aspect-[3/4]"
+            className="relative aspect-square"
           >
             {/* Halo atrás do conjunto, para ele "acender" sobre o fundo escuro. */}
-            <div className="absolute inset-[12%] -z-10 rounded-full bg-[radial-gradient(circle,rgb(0_163_224/0.35),transparent_70%)]" />
+            <div className="absolute inset-[8%] -z-10 rounded-full bg-[radial-gradient(circle,rgb(0_163_224/0.35),transparent_70%)]" />
             <Image
-              src="/img/gen/conjunto.jpg"
+              src="/img/gen/conjunto.png"
               alt="Linha Veipar: protetores galvalume e coloridos, PU 40 e bico injetor"
               fill
               priority
-              sizes="(min-width: 768px) 512px, 90vw"
-              className="object-cover [mask-image:radial-gradient(ellipse_62%_58%_at_50%_58%,black_60%,transparent_100%)]"
+              sizes="(min-width: 768px) 512px, 80vw"
+              className="object-contain drop-shadow-[0_30px_40px_rgb(0_0_0/0.45)]"
             />
           </motion.div>
           <motion.div
             initial={{ opacity: 0, scale: 0.6 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 1.1, type: 'spring', stiffness: 160, damping: 14 }}
-            className="absolute bottom-[8%] left-0 h-24 w-24 md:-left-4 md:h-32 md:w-32"
+            className="absolute bottom-[4%] -left-4 hidden h-32 w-32 md:block"
           >
             <div className="relative h-full w-full animate-spin-slow rounded-full bg-white p-1.5 shadow-lift">
               <Image src="/img/brand/selo-original.png" alt="Produto 100% original Veipar" fill sizes="128px" className="object-contain p-1" />

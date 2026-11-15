@@ -2,6 +2,9 @@
 
 /* Design system Veipar: azul ciano do logo + navy dos reels, Jost nos títulos e DM Sans no texto. */
 :root {
+  /* Só tema claro: impede o "modo escuro automático" do Chrome/Samsung no Android de inverter
+     as cores (deixava botão branco com texto branco). */
+  color-scheme: only light;
   --background: #f3f6fa;
   --surface: #ffffff;
   --foreground: #0b1b33;

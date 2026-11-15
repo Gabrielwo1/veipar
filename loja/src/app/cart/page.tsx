@@ -49,7 +49,7 @@ async function CartContent() {
   const coupon = cart.discountCodes[0]
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
+    <div className="grid gap-8 pb-24 lg:grid-cols-[1fr_380px] lg:pb-0">
       <ul className="space-y-3">
         {cart.lines.nodes.map((line) => (
           <li key={line.id} className="flex gap-4 rounded-[var(--radius-card)] bg-white p-4 shadow-soft">
@@ -80,6 +80,15 @@ async function CartContent() {
       </ul>
 
       <aside className="h-fit space-y-4 lg:sticky lg:top-28">
+        <ShippingCalculator
+          // Cotação antiga some quando o carrinho muda.
+          key={cart.lines.nodes.map((l) => `${l.id}:${l.quantity}`).join(',')}
+          items={cart.lines.nodes.map((l) => ({
+            variantId: l.merchandise.id,
+            price: l.merchandise.price.amount,
+            quantity: l.quantity,
+          }))}
+        />
         <div className="rounded-[var(--radius-card)] bg-white p-6 shadow-soft">
           <h2 className="font-display text-xl font-bold">Resumo</h2>
           <dl className="mt-4 space-y-2 text-sm">
@@ -100,33 +109,38 @@ async function CartContent() {
           </dl>
           <p className="mt-1 text-xs text-muted">Frete calculado no checkout.</p>
 
-          <form action={applyCoupon} className="mt-5 flex gap-2">
-            <label className="sr-only" htmlFor="code">Cupom</label>
-            <input id="code" name="code" defaultValue={coupon?.code ?? ''} placeholder="Cupom de desconto"
-              className="min-w-0 flex-1 rounded-xl border border-border bg-background px-3 py-2.5 text-sm uppercase" />
-            <button className="rounded-xl bg-navy px-4 text-sm font-semibold text-white hover:bg-royal">Aplicar</button>
-          </form>
-          {coupon && (
-            <p className={`mt-2 text-xs ${coupon.applicable ? 'text-success' : 'text-danger'}`}>
-              {coupon.applicable ? `Cupom ${coupon.code} aplicado ✓` : `O cupom ${coupon.code} não vale para este carrinho.`}
-            </p>
-          )}
+          <details open={!!coupon} className="group mt-4 text-sm">
+            <summary className="cursor-pointer list-none font-semibold text-royal [&::-webkit-details-marker]:hidden">
+              Tem um cupom de desconto?
+            </summary>
+            <form action={applyCoupon} className="mt-3 flex gap-2">
+              <label className="sr-only" htmlFor="code">Cupom</label>
+              <input id="code" name="code" defaultValue={coupon?.code ?? ''} placeholder="Cupom de desconto"
+                className="min-w-0 flex-1 rounded-xl border border-border bg-background px-3 py-2.5 text-base uppercase sm:text-sm" />
+              <button className="rounded-xl bg-navy px-4 text-sm font-semibold text-white hover:bg-royal">Aplicar</button>
+            </form>
+            {coupon && (
+              <p className={`mt-2 text-xs ${coupon.applicable ? 'text-success' : 'text-danger'}`}>
+                {coupon.applicable ? `Cupom ${coupon.code} aplicado ✓` : `O cupom ${coupon.code} não vale para este carrinho.`}
+              </p>
+            )}
+          </details>
 
           <CheckoutButton value={Number(cart.cost.totalAmount.amount)} numItems={cart.totalQuantity} />
           <p className="mt-3 text-center text-xs text-muted">Pagamento no checkout seguro da Shopify</p>
         </div>
 
-        <ShippingCalculator
-          // Cotação antiga some quando o carrinho muda.
-          key={cart.lines.nodes.map((l) => `${l.id}:${l.quantity}`).join(',')}
-          items={cart.lines.nodes.map((l) => ({
-            variantId: l.merchandise.id,
-            price: l.merchandise.price.amount,
-            quantity: l.quantity,
-          }))}
-        />
         <PatentStrip />
       </aside>
+
+      {/* No celular o resumo fica lá embaixo: total e botão de finalizar sempre à mão. */}
+      <div data-mobile-bar className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-border bg-white p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:hidden">
+        <div className="min-w-0">
+          <p className="text-xs text-muted">Total · {cart.totalQuantity} {cart.totalQuantity === 1 ? 'item' : 'itens'}</p>
+          <p className="font-display text-lg font-bold text-royal">{formatMoney(cart.cost.totalAmount)}</p>
+        </div>
+        <CheckoutButton value={Number(cart.cost.totalAmount.amount)} numItems={cart.totalQuantity} className="ml-auto flex-1" />
+      </div>
     </div>
   )
 }

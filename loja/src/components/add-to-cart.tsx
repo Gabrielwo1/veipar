@@ -126,7 +126,7 @@ export function AddToCart({
       </div>
 
       {/* Barra de compra fixa no celular. */}
-      <form action={buyNow} onSubmit={() => trackAdd(true)} className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-border bg-white p-3 pr-20 md:hidden">
+      <form action={buyNow} onSubmit={() => trackAdd(true)} data-mobile-bar className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-border bg-white p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:hidden">
         <input type="hidden" name="variantId" value={variant.id} />
         <input type="hidden" name="quantity" value={quantity} />
         <div className="min-w-0">

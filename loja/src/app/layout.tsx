@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { DM_Sans, Jost } from 'next/font/google'
 import { Suspense } from 'react'
 import { CartButton, CartLink } from '@/components/cart-link'
@@ -16,6 +16,11 @@ export const metadata: Metadata = {
   title: { default: 'Veipar · Proteção para parafusos de telhas', template: '%s · Veipar' },
   description:
     'Protetor de parafuso de telha patenteado, em aço Galvalume AZ 150. Acaba com goteira, ferrugem e borracha ressecada. Envio para todo o Brasil.',
+}
+
+export const viewport: Viewport = {
+  colorScheme: 'only light',
+  themeColor: '#071a36',
 }
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {

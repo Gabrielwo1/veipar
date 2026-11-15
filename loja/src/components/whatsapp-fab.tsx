@@ -8,7 +8,7 @@ export function WhatsAppFab() {
       target="_blank"
       rel="noopener"
       aria-label="Falar no WhatsApp"
-      className="group fixed bottom-5 right-5 z-30 flex items-center gap-2 rounded-full bg-success p-3.5 text-white shadow-lift transition hover:pr-5"
+      className="group fixed bottom-5 right-5 z-40 max-lg:[body:has([data-mobile-bar])_&]:bottom-[5.5rem] flex items-center gap-2 rounded-full bg-success p-3.5 text-white shadow-lift transition hover:pr-5"
     >
       <span className="absolute inset-0 -z-10 animate-ping rounded-full bg-success/40 [animation-duration:2.5s]" aria-hidden />
       <IconWhatsApp className="h-7 w-7" />
