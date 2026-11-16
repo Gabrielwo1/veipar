@@ -15,11 +15,12 @@ export const metadata: Metadata = {
   description: 'Conheça Veimar Antonio Alves, inventor do protetor de parafuso e do bico injetor Veipar, registrados no INPI.',
 }
 
-// Frases do próprio Veimar nas legendas do @veiparbrasil.
+// Frases do próprio Veimar nas legendas do @veiparbrasil, com fotos dele (@veiparbrasil e @veimarantonioalves).
+// `pos` enquadra o rosto: as fotos são verticais e o card corta em 4:5.
 const QUOTES = [
-  { text: 'Sabia que eu sou o criador dessa tampa de parafuso e desse bico injetor de PU.', image: '/img/ig/DfM_B5OKVD2.jpg' },
-  { text: 'Somos referência porque criamos nossos próprios produtos.', image: '/img/ig/DfZaVuDqerI.jpg' },
-  { text: 'A Veipar é uma empresa focada em resolver problemas.', image: '/img/ig/DfDdD4dJXe4.jpg' },
+  { text: 'Sabia que eu sou o criador dessa tampa de parafuso e desse bico injetor de PU.', image: '/img/ig/DfakrTTgIEc.jpg', pos: '50% 30%' },
+  { text: 'Somos referência porque criamos nossos próprios produtos.', image: '/img/ig/Dfce4wQgp62.jpg', pos: '50% 25%' },
+  { text: 'A Veipar é uma empresa focada em resolver problemas.', image: '/img/ig/DfDdD4dJXe4.jpg', pos: '50% 0%' },
 ]
 
 const GALLERY = ['DfQREPCJf2z', 'DffFDuhqWPM', 'DfXT2osqhmN', 'DfceKaLqw7I', 'DfpFm9JKQTa', 'Dfj4RWQqPNf']
@@ -76,16 +77,21 @@ export default function NossaHistoria() {
           <div className="mt-12 grid gap-5 md:grid-cols-3">
             {QUOTES.map((q, i) => (
               <Reveal key={q.text} delay={i * 0.12}>
-                <figure className="group relative h-full overflow-hidden rounded-[var(--radius-card)] bg-navy text-white shadow-lift">
-                  <div className="relative aspect-[4/3]">
-                    <Image src={q.image} alt="" fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover opacity-70 transition duration-700 group-hover:scale-105 group-hover:opacity-90" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-navy to-transparent" />
-                  </div>
-                  <blockquote className="relative -mt-10 p-6 font-display text-xl font-semibold leading-snug">
-                    <span className="mb-2 block font-display text-6xl leading-none text-cyan">“</span>
+                <figure className="group relative flex aspect-[4/5] flex-col justify-end overflow-hidden rounded-[var(--radius-card)] bg-navy text-white shadow-lift">
+                  <Image
+                    src={q.image}
+                    alt="Veimar Alves, criador da Veipar"
+                    fill
+                    sizes="(min-width: 768px) 33vw, 100vw"
+                    style={{ objectPosition: q.pos }}
+                    className="object-cover transition duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/70 via-35% to-transparent to-65%" />
+                  <blockquote className="relative px-6 font-display text-xl font-semibold leading-snug">
+                    <span className="block font-display text-5xl leading-none text-cyan">“</span>
                     {q.text}
                   </blockquote>
-                  <figcaption className="px-6 pb-6 text-sm text-white/55">Veimar Alves · @veiparbrasil</figcaption>
+                  <figcaption className="relative px-6 pb-6 pt-3 text-sm text-white/70">Veimar Alves · @veimarantonioalves</figcaption>
                 </figure>
               </Reveal>
             ))}
