@@ -14,7 +14,17 @@
 - **Missão:** proporcionar a solução definitiva para telhados, evitando problemas de infiltração e reparos frequentes com produtos inovadores e eficientes.
 - **Visão:** ser referência no mercado de proteção para telhados, reconhecida pela qualidade e eficácia das suas soluções patenteadas.
 - **Valores:** excelência na fabricação de tampas com tecnologia exclusiva e **patenteada**, garantindo uma vedação eficiente e padronizada.
-- **Patente:** o site diz que o produto é patenteado, mas não informa o número nem o status no INPI **(confirmar o número e se é patente concedida ou pedido depositado)**.
+- **Patente e registros no INPI** (documentos oficiais enviados pelo dono em 2026-11-16; os documentos também estão cadastrados no Programa de Proteção de Marcas do Mercado Livre):
+
+| O que protege | Tipo e número | Situação | Titular |
+|---|---|---|---|
+| **Bico injetor** ("Aperfeiçoamento em dispositivo para aplicação de poliuretano em capas protetoras de parafusos") | Patente de **modelo de utilidade BR 20 2025 011653-2** | **Concedida** (carta-patente expedida em 28/04/2026). Depósito em 09/06/2025, válida por 15 anos a partir dessa data | Veimar Antonio Alves (inventor) |
+| **Formato do protetor de parafuso** ("Configuração aplicada a/em protetor de parafuso") | **Desenho industrial BR 30 2022 000211-9**, classe 08-08 | **Concedido** em 08/02/2022. Depósito em 17/01/2022, válido por 10 anos (pede a taxa quinquenal de manutenção) | Beltrão Peneiras Ltda (autores: Leocir Bertolini e Veimar Antonio Alves) |
+| **Protetor para parafusos de fixação em telhas** ("Dispositivo protetor para parafusos de fixação em telhas") | Pedido de patente **BR 20 2025 006389-7**, IPC F16B 33/00 | **Pedido depositado** em 31/03/2025, ainda **não concedido**. Cessão de Beltrão Peneiras Ltda para Veimar Antonio Alves assinada em 14/09/2026 e anotação de transferência protocolada no INPI em 22/09/2026 (petição 870260097452) | Veimar Antonio Alves (após a transferência) |
+| **Marca figurativa** (desenho do parafuso com a capa sobre a telha ondulada) | **Marca nº 940285525**, classe Nice 06 | **Registro em vigor**: concedido em 14/07/2026, vigente até 14/07/2036 | VEIPAR LTDA |
+
+- **Reivindicação principal do bico injetor (BR 20 2025 011653-2):** bico com entrada roscada para encaixar na bisnaga de PU e canal interno cônico que conduz o PU até a saída. Características protegidas: (1) a saída é uma base com **cavidade de encaixe hexagonal** que se apoia na cabeça de uma ferramenta hexagonal, o que permite remover o canal interno para limpeza; (2) o canal cônico afunila de forma circular até essa cavidade; (3) a base tem pelo menos uma **marca de posição** ao lado da cavidade.
+- Ao falar com o cliente, diga apenas que o produto é patenteado e registrado no INPI. Os números acima servem para denúncias de cópia e documentos formais.
 - **História / ano de fundação:** não publicados.
 - **"VEIPAR ORIGINAL"**: o site usa essa expressão ("Rápido e seguro, confie no VEIPAR ORIGINAL, envios para todo o Brasil!").
 
@@ -121,7 +131,7 @@ Observações:
 - **Aplicação simples e rápida**, sem ferramentas especiais.
 - **Material:** aço nacional Galvalume AZ 150. Versão colorida com pintura epóxi.
 - **Excelente custo-benefício**, para uso profissional e **revenda**.
-- **Tecnologia exclusiva e patenteada** (ver ressalva na seção 1).
+- **Tecnologia exclusiva e patenteada** (números e situação na seção 1).
 - **Bico injetor:** aplicação rápida e uniforme, menos desperdício e retrabalho, melhor acabamento e mais produtividade na obra.
 - Não usar números de durabilidade em anos nem garantia: o site não publica nenhum dos dois.
 
@@ -164,7 +174,7 @@ O site não tem página de FAQ (`/pages/faq` não existe). As respostas abaixo f
 
 ## 7. Lacunas (o dono precisa preencher)
 1. Qual é o número oficial: WhatsApp +55 46 99123-3498 ou telefone +55 46 9138-6702?
-2. Número e status da patente (INPI); história da empresa, ano de fundação e quem é o fabricante (fábrica própria?).
+2. História da empresa, ano de fundação e quem é o fabricante (fábrica própria?).
 3. Compatibilidade: fibrocimento, telha sanduíche/termoacústica, policarbonato, cerâmica; bitolas e tamanhos de parafuso e arruela que cabem na capa.
 4. Diferença física entre o modelo trapezoidal e o "Ondulada"; se o colorido serve em telha ondulada.
 5. Peso real da peça (o site diz "0,04 g").
