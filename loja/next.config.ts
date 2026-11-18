@@ -18,8 +18,9 @@ const nextConfig: NextConfig = {
       { source: '/collections/all', destination: '/collections/colecao-veipar', permanent: true },
       { source: '/products', destination: '/collections/colecao-veipar', permanent: true },
       { source: '/collections/:collection/products/:handle', destination: '/products/:handle', permanent: true },
-      // O pacote de 500 tinha o endereço "...-100-pecas" na Shopify (renomeado em nov/2026); links antigos e anúncios ainda usam.
+      // Pacotes de 500 e 2.500 tinham endereços errados na Shopify (renomeados em nov/2026); links antigos e anúncios ainda usam.
       { source: '/products/protetor-de-parafuso-de-telha-100-pecas', destination: '/products/protetor-de-parafuso-de-telha-500-pecas', permanent: true },
+      { source: '/products/protetor-de-parafuso-de-telha-2500-pecas-copia', destination: '/products/protetor-de-parafuso-de-telha-2500-pecas', permanent: true },
       { source: '/search', destination: '/collections/colecao-veipar', permanent: false },
       { source: '/blogs/:path*', destination: '/', permanent: true },
       { source: '/pages/contact', destination: 'https://wa.me/5546991233498', permanent: false },
