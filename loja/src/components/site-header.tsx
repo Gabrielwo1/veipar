@@ -58,7 +58,7 @@ export function SiteHeader({ cart }: { cart: ReactNode }) {
       <header
         className={`sticky top-0 z-40 bg-white transition-shadow duration-300 ${scrolled ? 'shadow-soft' : ''}`}
       >
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 md:h-20">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-2 px-4 sm:gap-4 md:h-20">
           <button
             className="-ml-2 rounded-full p-2 md:hidden"
             aria-label="Abrir menu"
@@ -68,7 +68,7 @@ export function SiteHeader({ cart }: { cart: ReactNode }) {
           </button>
 
           <Link href="/" className="shrink-0" aria-label="Veipar, página inicial">
-            <Image src="/img/brand/logo-wordmark-navy.png" alt="Veipar" width={150} height={57} priority className="h-9 w-auto md:h-11" />
+            <Image src="/img/brand/logo-wordmark-navy.png" alt="Veipar" width={150} height={57} priority className="h-8 w-auto sm:h-9 md:h-11" />
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex">

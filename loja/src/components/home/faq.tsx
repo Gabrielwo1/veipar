@@ -33,7 +33,7 @@ const QUESTIONS = [
 
 export function Faq() {
   return (
-    <section id="duvidas" className="mx-auto grid max-w-7xl scroll-mt-24 gap-10 px-4 pt-24 md:grid-cols-[1fr_1.4fr]">
+    <section id="duvidas" className="mx-auto grid grid-cols-1 max-w-7xl scroll-mt-24 gap-10 px-4 pt-24 md:grid-cols-[1fr_1.4fr]">
       <div>
         <SectionTitle eyebrow="Dúvidas frequentes" title="Perguntou, a Veipar responde" />
         <Reveal delay={0.1}>

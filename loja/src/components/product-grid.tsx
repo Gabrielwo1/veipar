@@ -56,10 +56,10 @@ export function ProductCardView({ product, index = 0 }: { product: ProductCard; 
             {titulo.tipo && <span className="block text-[11px] font-medium text-muted sm:text-xs">{titulo.tipo}</span>}
             <span className="line-clamp-2 text-sm font-semibold sm:text-[15px]">{titulo.nome}</span>
           </Link>
-          <div className="mt-auto flex items-end justify-between gap-2 pt-3">
+          <div className="mt-auto flex flex-wrap items-end justify-between gap-2 pt-3">
             <div>
               {onSale && <p className="text-xs text-muted line-through">{formatMoney(compare)}</p>}
-              <p className="font-display text-lg font-bold text-royal sm:text-xl">{formatMoney(price)}</p>
+              <p className="whitespace-nowrap font-display text-lg font-bold text-royal sm:text-xl">{formatMoney(price)}</p>
             </div>
             {firstVariant && (
               <QuickAddButton

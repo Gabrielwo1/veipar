@@ -55,7 +55,7 @@ export function PatentBanner() {
             </p>
           </Reveal>
 
-          <div className="mt-10 grid gap-4 sm:grid-cols-2">
+          <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
             {PATENTS.map((p, i) => (
               <Reveal key={p.number} delay={0.15 + i * 0.12}>
                 <a

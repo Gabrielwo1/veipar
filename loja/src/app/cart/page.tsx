@@ -49,30 +49,30 @@ async function CartContent() {
   const coupon = cart.discountCodes[0]
 
   return (
-    <div className="grid gap-8 pb-24 lg:grid-cols-[1fr_380px] lg:pb-0">
+    <div className="grid grid-cols-1 gap-8 pb-24 lg:grid-cols-[1fr_380px] lg:pb-0">
       <ul className="space-y-3">
         {cart.lines.nodes.map((line) => (
-          <li key={line.id} className="flex gap-4 rounded-[var(--radius-card)] bg-white p-4 shadow-soft">
-            <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-ice">
+          <li key={line.id} className="flex gap-3 rounded-[var(--radius-card)] bg-white p-4 shadow-soft">
+            <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-ice sm:h-24 sm:w-24">
               {line.merchandise.image && (
                 <Image src={line.merchandise.image.url} alt={line.merchandise.product.title} fill sizes="96px" className="object-cover" />
               )}
             </div>
-            <div className="flex flex-1 flex-col gap-1">
+            <div className="flex min-w-0 flex-1 flex-col gap-1">
               <div className="flex items-start justify-between gap-3">
-                <Link href={`/products/${line.merchandise.product.handle}`} className="font-semibold leading-snug hover:text-royal">
+                <Link href={`/products/${line.merchandise.product.handle}`} className="min-w-0 break-words font-semibold leading-snug hover:text-royal">
                   {prettyTitle(line.merchandise.product.title)}
                 </Link>
                 <QuantityButton lineId={line.id} quantity={0} label="Remover">×</QuantityButton>
               </div>
               {line.merchandise.title !== 'Default Title' && <span className="text-xs text-muted">{line.merchandise.title}</span>}
-              <div className="mt-auto flex items-center justify-between pt-2">
+              <div className="mt-auto flex flex-wrap items-center justify-between gap-x-3 gap-y-2 pt-2">
                 <div className="flex items-center gap-1">
                   <QuantityButton lineId={line.id} quantity={line.quantity - 1} label="Diminuir">−</QuantityButton>
                   <span className="w-9 text-center font-display font-bold">{line.quantity}</span>
                   <QuantityButton lineId={line.id} quantity={line.quantity + 1} label="Aumentar">+</QuantityButton>
                 </div>
-                <p className="font-display text-lg font-bold">{formatMoney(line.cost.totalAmount)}</p>
+                <p className="whitespace-nowrap font-display text-base font-bold sm:text-lg">{formatMoney(line.cost.totalAmount)}</p>
               </div>
             </div>
           </li>

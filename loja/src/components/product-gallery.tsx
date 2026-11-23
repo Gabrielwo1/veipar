@@ -11,7 +11,7 @@ export function ProductGallery({ images, title }: { images: ShopifyImage[]; titl
   if (!current) return null
 
   return (
-    <div className="md:sticky md:top-28">
+    <div className="min-w-0 md:sticky md:top-28">
       <div className="relative aspect-square overflow-hidden rounded-[2rem] bg-white shadow-soft">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div

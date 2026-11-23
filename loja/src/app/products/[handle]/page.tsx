@@ -50,7 +50,7 @@ async function ProductDetails({ params }: Pick<PageProps<'/products/[handle]'>, 
         <Link href="/collections/colecao-veipar" className="hover:text-royal">Produtos</Link>
       </nav>
 
-      <div className="grid gap-10 md:grid-cols-2 lg:gap-16">
+      <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:gap-16">
         <ProductGallery images={product.images.nodes} title={product.title} />
 
         <div>

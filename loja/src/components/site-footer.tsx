@@ -37,7 +37,7 @@ export function SiteFooter() {
   return (
     <footer className="relative overflow-hidden bg-navy text-white">
       <div className="blueprint-grid absolute inset-0 opacity-60" aria-hidden />
-      <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-16 md:grid-cols-[1.3fr_repeat(3,1fr)]">
+      <div className="relative mx-auto grid grid-cols-1 max-w-7xl gap-10 px-4 py-16 md:grid-cols-[1.3fr_repeat(3,1fr)]">
         <div>
           <Image src="/img/brand/logo-wordmark-branco.png" alt="Veipar" width={170} height={64} className="h-12 w-auto" />
           <p className="mt-4 max-w-xs text-sm text-white/65">

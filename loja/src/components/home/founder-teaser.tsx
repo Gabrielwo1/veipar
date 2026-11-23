@@ -9,7 +9,7 @@ export function FounderTeaser() {
       <div className="relative overflow-hidden rounded-[2rem] bg-navy text-white">
         <Image src="/img/gen/oficina.jpg" alt="" fill sizes="100vw" className="object-cover opacity-35" />
         <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/80 to-transparent" />
-        <div className="relative grid items-center gap-10 p-8 md:grid-cols-[1.2fr_1fr] md:p-14">
+        <div className="relative grid grid-cols-1 items-center gap-10 p-8 md:grid-cols-[1.2fr_1fr] md:p-14">
           <Reveal>
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-cyan">Quem criou o Veipar</p>
             <blockquote className="mt-4 font-display text-3xl font-bold leading-tight md:text-5xl">

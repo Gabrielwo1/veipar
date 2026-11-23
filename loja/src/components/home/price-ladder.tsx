@@ -44,7 +44,7 @@ export function PriceLadder({ products }: { products: ProductCard[] }) {
                 <p className={`text-sm ${best ? 'text-white/60' : 'text-muted'}`}>peças</p>
                 <p className={`mt-4 font-display text-2xl font-bold ${best ? 'text-cyan' : 'text-royal'}`}>{formatMoney(price)}</p>
                 {save > 0 && <p className="text-xs font-semibold text-success">Economize {save}%</p>}
-                <div className="mt-auto flex items-center justify-between gap-2 pt-5">
+                <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-5">
                   <Link href={`/products/${p.handle}`} className={`text-sm font-semibold underline-offset-4 hover:underline ${best ? 'text-white' : ''}`}>
                     Ver detalhes
                   </Link>

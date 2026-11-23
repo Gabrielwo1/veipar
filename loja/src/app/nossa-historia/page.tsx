@@ -37,7 +37,7 @@ export default function NossaHistoria() {
       <StoryHero />
 
       {/* Origem */}
-      <section className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-24 md:grid-cols-2">
+      <section className="mx-auto grid grid-cols-1 max-w-7xl items-center gap-12 px-4 py-24 md:grid-cols-2">
         <Reveal className="relative">
           <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] shadow-lift">
             <Image src="/img/ig/DfM_B5OKVD2.jpg" alt="Veimar Alves instalando Veipar no telhado" fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />
@@ -74,7 +74,7 @@ export default function NossaHistoria() {
       <section className="bg-white py-24">
         <div className="mx-auto max-w-7xl px-4">
           <SectionTitle center eyebrow="Nas palavras dele" title="Quem inventa, explica" />
-          <div className="mt-12 grid gap-5 md:grid-cols-3">
+          <div className="mt-12 grid grid-cols-1 gap-5 md:grid-cols-3">
             {QUOTES.map((q, i) => (
               <Reveal key={q.text} delay={i * 0.12}>
                 <figure className="group relative flex aspect-[4/5] flex-col justify-end overflow-hidden rounded-[var(--radius-card)] bg-navy text-white shadow-lift">
@@ -132,7 +132,7 @@ export default function NossaHistoria() {
 
       {/* Missão, visão, valores */}
       <section className="mx-auto max-w-7xl px-4">
-        <div className="grid gap-5 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
           {VALUES.map((v, i) => (
             <Reveal key={v.title} delay={i * 0.1}>
               <div className="h-full rounded-[var(--radius-card)] bg-white p-8 shadow-soft">

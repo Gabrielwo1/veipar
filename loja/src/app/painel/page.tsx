@@ -140,7 +140,7 @@ async function Painel({ searchParams }: { searchParams: PageProps<'/painel'>['se
         />
       </div>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card titulo="Faturamento por dia">
           {v ? <BarrasPorDia dias={diasDoPeriodo} valores={diasDoPeriodo.map((d) => v.porDia.get(d) ?? 0)} formato="brl" /> : <Vazio />}
         </Card>
@@ -149,7 +149,7 @@ async function Painel({ searchParams }: { searchParams: PageProps<'/painel'>['se
         </Card>
       </div>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-3">
+      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
         <Card titulo="Funil de compra" className="lg:col-span-2">
           {m ? (
             <Funil
@@ -168,7 +168,7 @@ async function Painel({ searchParams }: { searchParams: PageProps<'/painel'>['se
         <Card titulo="De onde vêm as visitas">{m ? <Lista itens={m.origens} /> : <Vazio />}</Card>
       </div>
 
-      <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card titulo="Produtos mais vendidos">
           {v ? <Lista itens={v.produtos} sufixo=" un." /> : <Vazio />}
         </Card>

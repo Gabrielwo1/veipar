@@ -20,7 +20,7 @@ export function ProblemSolution() {
   return (
     <section className="relative mt-24 overflow-hidden bg-[#12070a] text-white">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(229,72,77,0.25),transparent_60%)]" />
-      <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 md:grid-cols-2 md:py-28">
+      <div className="relative mx-auto grid grid-cols-1 max-w-7xl items-center gap-12 px-4 py-20 md:grid-cols-2 md:py-28">
         <Reveal>
           <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] shadow-lift">
             <Image src="/img/gen/problema.jpg" alt="Parafuso de telha enferrujado com borracha ressecada" fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />

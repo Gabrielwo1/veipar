@@ -22,7 +22,7 @@ export function Hero() {
       <div className="absolute inset-0 -z-10 bg-gradient-to-r from-navy via-navy/85 to-navy/10" />
       <div className="absolute inset-0 -z-10 bg-gradient-to-t from-navy via-transparent to-transparent" />
 
-      <div className="relative mx-auto grid min-h-[640px] max-w-7xl items-center gap-10 px-4 pb-24 pt-14 md:min-h-[680px] md:grid-cols-[1.25fr_1fr] md:pb-20">
+      <div className="relative mx-auto grid grid-cols-1 min-h-[640px] max-w-7xl items-center gap-10 px-4 pb-24 pt-14 md:min-h-[680px] md:grid-cols-[1.25fr_1fr] md:pb-20">
         <div className="relative z-10">
           <motion.p
             initial={{ opacity: 0, y: 12 }}

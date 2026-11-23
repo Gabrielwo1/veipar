@@ -14,7 +14,7 @@ function formatMoney({ amount, currencyCode }: Money) {
 function Buttons({ disabled }: { disabled: boolean }) {
   const { pending } = useFormStatus()
   return (
-    <div className="grid gap-3 sm:grid-cols-2">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
       <button
         type="submit"
         formAction={buyNow}

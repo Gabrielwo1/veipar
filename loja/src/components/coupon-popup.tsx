@@ -82,7 +82,7 @@ export function CouponPopup() {
         >
           <button className="absolute inset-0 bg-navy/60 backdrop-blur-sm" aria-label="Fechar" onClick={() => setOpen(false)} />
           <motion.div
-            className="relative grid w-full max-w-3xl overflow-hidden rounded-[2rem] bg-white shadow-lift sm:grid-cols-[1fr_1.1fr]"
+            className="relative grid grid-cols-1 w-full max-w-3xl overflow-hidden rounded-[2rem] bg-white shadow-lift sm:grid-cols-[1fr_1.1fr]"
             initial={{ y: 60, scale: 0.94, opacity: 0 }}
             animate={{ y: 0, scale: 1, opacity: 1 }}
             exit={{ y: 40, scale: 0.96, opacity: 0 }}

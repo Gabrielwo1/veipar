@@ -13,7 +13,7 @@ export function HowTo() {
   return (
     <section id="como-instalar" className="mx-auto max-w-7xl scroll-mt-24 px-4 pt-24">
       <SectionTitle center eyebrow="Aplicação simples e rápida" title="Instala em 3 passos" text="Sem ferramenta especial. Funciona em telha trapezoidal e ondulada de aço." />
-      <ol className="mt-12 grid gap-5 md:grid-cols-3">
+      <ol className="mt-12 grid grid-cols-1 gap-5 md:grid-cols-3">
         {STEPS.map((s, i) => (
           <Reveal key={s.n} delay={i * 0.12}>
             <li className="group relative overflow-hidden rounded-[var(--radius-card)] bg-surface shadow-soft">
